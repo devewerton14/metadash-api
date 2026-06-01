@@ -93,12 +93,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .bar{width:100%;border-radius:3px 3px 0 0;background:var(--purple)33;min-height:2px}
 .bar.today{background:var(--purple)}
 .bar-label{font-size:8px;color:var(--text4);font-family:'DM Mono',monospace}
-.toggle-row{display:flex;align-items:center;justify-content:space-between;margin:0 1.25rem 0.75rem;padding:10px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:10px}
-.toggle-label{font-size:13px;color:var(--text);font-weight:500}
-.ios-toggle{display:inline-flex;align-items:center;width:52px;height:30px;border-radius:15px;background:#555;transition:background 0.3s;cursor:pointer;flex-shrink:0;padding:2px}
-.ios-toggle.active{background:#34D399}
-.ios-toggle-thumb{width:26px;height:26px;background:#fff;border-radius:50%;box-shadow:0 2px 4px rgba(0,0,0,0.4);transition:transform 0.3s;transform:translateX(0)}
-.ios-toggle.active .ios-toggle-thumb{transform:translateX(22px)}
+
+.camp-filter-pills{display:flex;gap:6px;margin:0 1.25rem 0.75rem}
+.camp-pill{flex:1;text-align:center;padding:8px 0;border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--border);background:var(--bg2);color:var(--text3);transition:all 0.2s}
+.camp-pill.active-pill{background:var(--green-bg);border-color:var(--green);color:var(--green)}
 .camp-list{padding:0 1.25rem;margin-bottom:1rem;display:flex;flex-direction:column;gap:8px}
 .camp-item{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:1rem;display:flex;align-items:center;gap:12px;cursor:pointer;transition:border-color 0.15s}
 .camp-item:active{border-color:var(--purple)55}
@@ -292,11 +290,9 @@ function renderDash(campaigns, daily, spendVal, impressionsVal, clicksVal, conve
       </div>
     </div>
     <div class="section-title">Campanhas</div>
-    <div class="toggle-row">
-      <span class="toggle-label">Apenas campanhas ativas</span>
-      <div class="ios-toggle active" id="toggle-active" onclick="toggleOnlyActive()">
-        <div class="ios-toggle-thumb"></div>
-      </div>
+    <div class="camp-filter-pills">
+      <div class="camp-pill active-pill" id="pill-active" onclick="setPillFilter(true)">● Ativas</div>
+      <div class="camp-pill" id="pill-all" onclick="setPillFilter(false)">○ Todas</div>
     </div>
     <div class="camp-list">${campsHtml}</div>
   `;
@@ -421,14 +417,10 @@ function setPeriod(p, el) {
   loadDash();
 }
 
-function toggleOnlyActive() {
-  const toggle = document.getElementById('toggle-active');
-  onlyActive = !onlyActive;
-  if (onlyActive) {
-    toggle.classList.add('active');
-  } else {
-    toggle.classList.remove('active');
-  }
+function setPillFilter(activeOnly) {
+  onlyActive = activeOnly;
+  document.getElementById('pill-active').className = 'camp-pill' + (activeOnly ? ' active-pill' : '');
+  document.getElementById('pill-all').className = 'camp-pill' + (!activeOnly ? ' active-pill' : '');
   applyFilter();
 }
 
