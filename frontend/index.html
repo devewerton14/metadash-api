@@ -243,13 +243,7 @@ function renderDash(campaigns, daily, spendVal, impressionsVal, clicksVal, conve
   const maxVal = maxSpend.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
   const minVal = minSpend.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
 
-  // Reaplica estado dos botões após render
-  setTimeout(() => {
-    const ba = document.getElementById('btn-ativas');
-    const bt = document.getElementById('btn-todas');
-    if (ba) ba.className = 'camp-btn' + (onlyActive ? ' camp-btn-on' : '');
-    if (bt) bt.className = 'camp-btn' + (!onlyActive ? ' camp-btn-on' : '');
-  }, 0);
+  setTimeout(updateCampButtons, 0);
 
   const campsHtml = (campaigns||[]).map(c => `
     <div class="camp-item" onclick="openCampaign('${c.id}','${c.name.replace(/'/g,"\\'").replace(/`/g,"'")}')">
@@ -301,7 +295,7 @@ function renderDash(campaigns, daily, spendVal, impressionsVal, clicksVal, conve
       </div>
     </div>
     <div class="section-title">Campanhas</div>
-    <div style="display:flex;gap:8px;padding:0 1.25rem;margin-bottom:0.75rem"><div style="flex:1;padding:9px 0;border-radius:10px;font-size:13px;font-weight:600;text-align:center;cursor:pointer;border:2px solid ${onlyActive?'#34D399':'#333'};background:${onlyActive?'#34D399':'transparent'};color:${onlyActive?'#000':'#555'}" onclick="setCampFilter(true)">Ativas</div><div style="flex:1;padding:9px 0;border-radius:10px;font-size:13px;font-weight:600;text-align:center;cursor:pointer;border:2px solid ${!onlyActive?'#34D399':'#333'};background:${!onlyActive?'#34D399':'transparent'};color:${!onlyActive?'#000':'#555'}" onclick="setCampFilter(false)">Todas</div></div>
+    <div style="display:flex;gap:8px;padding:0 1.25rem;margin-bottom:0.75rem"><div id="cb-ativas" style="flex:1;padding:9px 0;border-radius:10px;font-size:13px;font-weight:600;text-align:center;cursor:pointer" onclick="setCampFilter(true)">Ativas</div><div id="cb-todas" style="flex:1;padding:9px 0;border-radius:10px;font-size:13px;font-weight:600;text-align:center;cursor:pointer" onclick="setCampFilter(false)">Todas</div></div>
     <div class="camp-list">${campsHtml}</div>
   `;
 }
@@ -427,9 +421,18 @@ function setPeriod(p, el) {
 
 function setCampFilter(activeOnly) {
   onlyActive = activeOnly;
-  document.getElementById('btn-ativas').className = 'camp-btn' + (activeOnly ? ' camp-btn-on' : '');
-  document.getElementById('btn-todas').className = 'camp-btn' + (!activeOnly ? ' camp-btn-on' : '');
+  updateCampButtons();
   applyFilter();
+}
+
+function updateCampButtons() {
+  const ba = document.getElementById('cb-ativas');
+  const bt = document.getElementById('cb-todas');
+  if (!ba || !bt) return;
+  const onStyle = 'flex:1;padding:9px 0;border-radius:10px;font-size:13px;font-weight:600;text-align:center;cursor:pointer;background:#34D399;border:2px solid #34D399;color:#000';
+  const offStyle = 'flex:1;padding:9px 0;border-radius:10px;font-size:13px;font-weight:600;text-align:center;cursor:pointer;background:transparent;border:2px solid #333;color:#555';
+  ba.style.cssText = onlyActive ? onStyle : offStyle;
+  bt.style.cssText = !onlyActive ? onStyle : offStyle;
 }
 
 function toggleTheme() {
