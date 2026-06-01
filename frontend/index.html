@@ -4,18 +4,13 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>MetaDash</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'DM Sans',sans-serif;background:#0A0A0F;color:#F0EEF8;min-height:100vh}
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
-
-.screen{display:none}
-.screen.active{display:block}
-
-/* LOGIN */
+.screen{display:none}.screen.active{display:block}
 .login-wrap{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:2rem 1.5rem;max-width:420px;margin:0 auto}
-.logo{font-size:28px;font-weight:600;letter-spacing:-0.5px;margin-bottom:8px}
-.logo span{color:#7B61FF}
+.logo{font-size:28px;font-weight:600;letter-spacing:-0.5px;margin-bottom:8px}.logo span{color:#7B61FF}
 .tagline{font-size:14px;color:#888;margin-bottom:3rem;font-weight:300}
 .label{font-size:11px;text-transform:uppercase;letter-spacing:1.2px;color:#666;margin-bottom:6px;font-weight:500}
 .input{width:100%;background:#14141C;border:1px solid #222230;border-radius:10px;padding:14px 16px;font-size:15px;font-family:'DM Sans',sans-serif;color:#F0EEF8;margin-bottom:1rem;outline:none;transition:border-color 0.2s}
@@ -24,14 +19,9 @@ body{font-family:'DM Sans',sans-serif;background:#0A0A0F;color:#F0EEF8;min-heigh
 .btn:active{transform:scale(0.98);opacity:0.9}
 .hint{font-size:12px;color:#555;text-align:center;margin-top:1.5rem}
 .error-msg{background:#3D1515;color:#F87171;padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:1rem;display:none}
-
-/* HEADER */
 .header{padding:1rem 1.25rem 0.75rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:#0A0A0FEE;backdrop-filter:blur(12px);z-index:10;border-bottom:1px solid #14141C}
-.header-logo{font-size:18px;font-weight:600;letter-spacing:-0.3px}
-.header-logo span{color:#7B61FF}
+.header-logo{font-size:18px;font-weight:600;letter-spacing:-0.3px}.header-logo span{color:#7B61FF}
 .avatar{width:32px;height:32px;border-radius:50%;background:#7B61FF22;border:1.5px solid #7B61FF44;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#7B61FF;cursor:pointer}
-
-/* DASHBOARD */
 .dash{max-width:420px;margin:0 auto;padding-bottom:2rem}
 .period-tabs{padding:0.75rem 1.25rem;display:flex;gap:4px}
 .ptab{flex:1;text-align:center;padding:6px 0;font-size:12px;font-weight:500;border-radius:8px;cursor:pointer;color:#555;transition:all 0.15s;border:none;background:none}
@@ -41,24 +31,57 @@ body{font-family:'DM Sans',sans-serif;background:#0A0A0F;color:#F0EEF8;min-heigh
 .hero-label{font-size:11px;text-transform:uppercase;letter-spacing:1.2px;color:#555;margin-bottom:4px}
 .hero-value{font-size:32px;font-weight:600;letter-spacing:-1px;margin-bottom:2px}
 .hero-currency{font-size:18px;font-weight:400;color:#888}
-.delta{font-size:12px;font-family:'DM Mono',monospace;display:inline-flex;align-items:center;gap:3px;padding:3px 8px;border-radius:20px;background:#0F3D2A;color:#34D399;margin-top:4px}
+.delta{font-size:12px;font-family:'DM Mono',monospace;display:inline-flex;align-items:center;gap:3px;padding:3px 8px;border-radius:20px;background:#1A1A2E;color:#7B61FF;margin-top:4px}
 .section-title{padding:0.5rem 1.25rem;font-size:11px;text-transform:uppercase;letter-spacing:1.2px;color:#555;font-weight:500}
 .metrics-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 1.25rem;margin-bottom:1rem}
 .metric-card{background:#14141C;border:1px solid #1E1E2E;border-radius:12px;padding:1rem}
 .mc-label{font-size:11px;color:#555;margin-bottom:6px}
 .mc-value{font-size:20px;font-weight:600;letter-spacing:-0.5px;margin-bottom:4px}
 .mc-sub{font-size:11px;font-family:'DM Mono',monospace;color:#666}
-.mc-sub.up{color:#34D399}
-.mc-sub.down{color:#F87171}
+.mc-sub.up{color:#34D399}.mc-sub.down{color:#F87171}.mc-sub.purple{color:#7B61FF}
 .loading{text-align:center;padding:3rem;color:#555;font-size:14px}
 .spinner{display:inline-block;width:20px;height:20px;border:2px solid #333;border-top-color:#7B61FF;border-radius:50%;animation:spin 0.8s linear infinite;margin-right:8px;vertical-align:middle}
 @keyframes spin{to{transform:rotate(360deg)}}
-.client-name{padding:0 1.25rem 0.5rem;font-size:22px;font-weight:600;letter-spacing:-0.5px}
+.client-name{padding:0.75rem 1.25rem 0.25rem;font-size:22px;font-weight:600;letter-spacing:-0.5px}
+
+/* GRÁFICO */
+.chart-card{margin:0 1.25rem 1rem;background:#14141C;border:1px solid #1E1E2E;border-radius:16px;padding:1.25rem}
+.chart-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem}
+.chart-title{font-size:13px;font-weight:500}
+.chart-meta{font-size:11px;color:#555}
+.bars{display:flex;align-items:flex-end;gap:3px;height:80px}
+.bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px}
+.bar{width:100%;border-radius:3px 3px 0 0;background:#7B61FF33;min-height:2px}
+.bar.today{background:#7B61FF}
+.bar-label{font-size:8px;color:#444;font-family:'DM Mono',monospace}
+
+/* CAMPANHAS */
+.camp-list{padding:0 1.25rem;margin-bottom:1rem;display:flex;flex-direction:column;gap:8px}
+.camp-item{background:#14141C;border:1px solid #1E1E2E;border-radius:12px;padding:1rem;display:flex;align-items:center;gap:12px;cursor:pointer;transition:border-color 0.15s}
+.camp-item:active{border-color:#7B61FF55}
+.camp-dot{width:8px;height:8px;border-radius:50%;background:#34D399;flex-shrink:0}
+.camp-info{flex:1;min-width:0}
+.camp-name{font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.camp-type{font-size:11px;color:#555;margin-top:2px}
+.camp-arrow{font-size:16px;color:#444}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:#000000CC;z-index:100;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.25s}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal{background:#0F0F18;border-radius:20px 20px 0 0;width:100%;max-width:420px;padding:1.5rem 1.25rem 2.5rem;transform:translateY(100%);transition:transform 0.3s cubic-bezier(.34,1.56,.64,1);max-height:85vh;overflow-y:auto}
+.modal-overlay.open .modal{transform:translateY(0)}
+.modal-handle{width:36px;height:4px;background:#333;border-radius:2px;margin:0 auto 1.25rem}
+.modal-title{font-size:16px;font-weight:600;margin-bottom:4px;letter-spacing:-0.3px}
+.modal-sub{font-size:12px;color:#555;margin-bottom:1.25rem}
+.modal-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:1rem}
+.modal-card{background:#14141C;border:1px solid #1E1E2E;border-radius:10px;padding:0.875rem}
+.modal-card .mc-value{font-size:18px}
+.close-btn{width:100%;background:#14141C;border:1px solid #222230;border-radius:10px;padding:12px;font-size:14px;font-family:'DM Sans',sans-serif;color:#888;cursor:pointer;margin-top:0.5rem}
+.modal-loading{text-align:center;padding:2rem;color:#555;font-size:13px}
 </style>
 </head>
 <body>
 
-<!-- LOGIN -->
 <div class="screen active" id="screen-login">
   <div class="login-wrap">
     <div class="logo">meta<span>dash</span></div>
@@ -71,7 +94,6 @@ body{font-family:'DM Sans',sans-serif;background:#0A0A0F;color:#F0EEF8;min-heigh
   </div>
 </div>
 
-<!-- DASHBOARD -->
 <div class="screen" id="screen-dash">
   <div class="header">
     <div class="header-logo">meta<span>dash</span></div>
@@ -87,24 +109,28 @@ body{font-family:'DM Sans',sans-serif;background:#0A0A0F;color:#F0EEF8;min-heigh
   </div>
 </div>
 
+<!-- MODAL CAMPANHA -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+  <div class="modal" id="modal">
+    <div class="modal-handle"></div>
+    <div id="modal-content"><div class="modal-loading"><span class="spinner"></span>Carregando...</div></div>
+    <button class="close-btn" onclick="closeModal()">Fechar</button>
+  </div>
+</div>
+
 <script>
 const API = 'https://metadash-api.cjwrxp.easypanel.host';
 let currentClient = null;
 let currentPeriod = '30d';
+let currentAccountId = null;
 
 async function doLogin() {
   const email = document.getElementById('login-email').value.trim();
   if (!email) return;
-  
   const res = await fetch(`${API}/clients`);
   const clients = await res.json();
   const client = clients.find(c => c.email === email);
-  
-  if (!client) {
-    document.getElementById('error-msg').style.display = 'block';
-    return;
-  }
-  
+  if (!client) { document.getElementById('error-msg').style.display = 'block'; return; }
   document.getElementById('error-msg').style.display = 'none';
   currentClient = client;
   document.getElementById('avatar').textContent = client.name.slice(0,2).toUpperCase();
@@ -115,27 +141,41 @@ async function doLogin() {
 
 async function loadDash() {
   document.getElementById('dash-content').innerHTML = '<div class="loading"><span class="spinner"></span>Carregando métricas...</div>';
-  
   const accRes = await fetch(`${API}/accounts/${currentClient.id}`);
   const accounts = await accRes.json();
-  
-  if (!accounts.length) {
-    document.getElementById('dash-content').innerHTML = '<div class="loading">Nenhuma conta encontrada.</div>';
-    return;
-  }
-  
+  if (!accounts.length) { document.getElementById('dash-content').innerHTML = '<div class="loading">Nenhuma conta encontrada.</div>'; return; }
   const acc = accounts[0];
+  currentAccountId = acc.id;
   const metRes = await fetch(`${API}/metrics/${acc.id}?period=${currentPeriod}`);
   const m = await metRes.json();
-  
-  const roas = m.spend > 0 ? ((m.conversions * 100) / m.spend).toFixed(1) : '—';
-  
+  if (m.error) { document.getElementById('dash-content').innerHTML = '<div class="loading">Erro ao carregar métricas.</div>'; return; }
+
+  const cpc = m.clicks > 0 ? (parseFloat(m.spend)/m.clicks).toFixed(2) : '0.00';
+  const maxSpend = Math.max(...(m.daily||[]).map(d=>d.spend), 1);
+  const barsHtml = (m.daily||[]).slice(-14).map((d,i,arr) => {
+    const h = Math.max(Math.round((d.spend/maxSpend)*76), 2);
+    const isLast = i === arr.length-1;
+    const day = new Date(d.date).getDate();
+    return `<div class="bar-wrap"><div class="bar${isLast?' today':''}" style="height:${h}px"></div><div class="bar-label">${day}</div></div>`;
+  }).join('');
+
+  const campsHtml = (m.campaigns||[]).map(c => `
+    <div class="camp-item" onclick="openCampaign('${c.id}','${c.name.replace(/'/g,"\\'")}')">
+      <div class="camp-dot"></div>
+      <div class="camp-info">
+        <div class="camp-name">${c.name}</div>
+        <div class="camp-type">${fmtObjective(c.objective)}</div>
+      </div>
+      <div class="camp-arrow">›</div>
+    </div>
+  `).join('') || '<div style="padding:1rem 1.25rem;font-size:13px;color:#555">Nenhuma campanha ativa</div>';
+
   document.getElementById('dash-content').innerHTML = `
     <div class="client-name">${currentClient.name}</div>
     <div class="hero">
       <div class="hero-label">Valor Gasto</div>
       <div class="hero-value"><span class="hero-currency">R$ </span>${parseFloat(m.spend).toLocaleString('pt-BR',{minimumFractionDigits:2})}</div>
-      <div class="delta">▲ Últimos ${currentPeriod === '7d' ? '7' : currentPeriod === '30d' ? '30' : '90'} dias</div>
+      <div class="delta">Últimos ${currentPeriod === '7d' ? '7' : currentPeriod === '30d' ? '30' : '90'} dias</div>
     </div>
     <div class="section-title">Visão Geral</div>
     <div class="metrics-grid">
@@ -143,16 +183,67 @@ async function loadDash() {
       <div class="metric-card"><div class="mc-label">Impressões</div><div class="mc-value">${fmtNum(m.impressions)}</div><div class="mc-sub">exibições</div></div>
       <div class="metric-card"><div class="mc-label">Cliques</div><div class="mc-value">${fmtNum(m.clicks)}</div><div class="mc-sub up">CTR ${m.ctr}%</div></div>
       <div class="metric-card"><div class="mc-label">CPM</div><div class="mc-value">R$ ${parseFloat(m.cpm).toLocaleString('pt-BR',{minimumFractionDigits:2})}</div><div class="mc-sub">por mil impressões</div></div>
-      <div class="metric-card"><div class="mc-label">Conversões</div><div class="mc-value">${m.conversions}</div><div class="mc-sub ${m.conversions > 0 ? 'up' : ''}">resultados</div></div>
-      <div class="metric-card"><div class="mc-label">CPM Médio</div><div class="mc-value">R$ ${(m.spend/Math.max(m.clicks,1)).toFixed(2)}</div><div class="mc-sub">custo por clique</div></div>
+      <div class="metric-card"><div class="mc-label">Conversas</div><div class="mc-value">${fmtNum(m.conversations)}</div><div class="mc-sub purple">WhatsApp iniciadas</div></div>
+      <div class="metric-card"><div class="mc-label">CPC</div><div class="mc-value">R$ ${cpc}</div><div class="mc-sub">custo por clique</div></div>
+    </div>
+    <div class="section-title">Gasto Diário</div>
+    <div class="chart-card">
+      <div class="chart-header"><div class="chart-title">Evolução de gastos</div><div class="chart-meta">R$ ${parseFloat(m.spend).toLocaleString('pt-BR',{minimumFractionDigits:2})} total</div></div>
+      <div class="bars">${barsHtml}</div>
+    </div>
+    <div class="section-title">Campanhas Ativas</div>
+    <div class="camp-list">${campsHtml}</div>
+  `;
+}
+
+async function openCampaign(campId, campName) {
+  document.getElementById('modal-content').innerHTML = '<div class="modal-loading"><span class="spinner"></span>Carregando campanha...</div>';
+  document.getElementById('modal-overlay').classList.add('open');
+  
+  const res = await fetch(`${API}/campaign/${campId}?accountId=${currentAccountId}&period=${currentPeriod}`);
+  const m = await res.json();
+  
+  if (m.error) {
+    document.getElementById('modal-content').innerHTML = '<div class="modal-loading">Erro ao carregar campanha.</div>';
+    return;
+  }
+
+  const cpc = m.clicks > 0 ? (parseFloat(m.spend)/m.clicks).toFixed(2) : '0.00';
+
+  document.getElementById('modal-content').innerHTML = `
+    <div class="modal-title">${campName}</div>
+    <div class="modal-sub">Métricas dos últimos ${currentPeriod === '7d' ? '7' : currentPeriod === '30d' ? '30' : '90'} dias</div>
+    <div class="modal-grid">
+      <div class="modal-card"><div class="mc-label">Gasto</div><div class="mc-value">R$ ${parseFloat(m.spend).toLocaleString('pt-BR',{minimumFractionDigits:2})}</div></div>
+      <div class="modal-card"><div class="mc-label">Alcance</div><div class="mc-value">${fmtNum(m.reach)}</div></div>
+      <div class="modal-card"><div class="mc-label">Impressões</div><div class="mc-value">${fmtNum(m.impressions)}</div></div>
+      <div class="modal-card"><div class="mc-label">Frequência</div><div class="mc-value">${m.frequency}×</div></div>
+      <div class="modal-card"><div class="mc-label">Cliques</div><div class="mc-value">${fmtNum(m.clicks)}</div><div class="mc-sub up">CTR ${m.ctr}%</div></div>
+      <div class="modal-card"><div class="mc-label">CPM</div><div class="mc-value">R$ ${parseFloat(m.cpm).toLocaleString('pt-BR',{minimumFractionDigits:2})}</div></div>
+      <div class="modal-card"><div class="mc-label">Conversas</div><div class="mc-value">${fmtNum(m.conversations)}</div><div class="mc-sub purple">WhatsApp</div></div>
+      <div class="modal-card"><div class="mc-label">CPC</div><div class="mc-value">R$ ${cpc}</div></div>
     </div>
   `;
+}
+
+function closeModal(e) {
+  if (e && e.target !== document.getElementById('modal-overlay')) return;
+  document.getElementById('modal-overlay').classList.remove('open');
 }
 
 function fmtNum(n) {
   if (n >= 1000000) return (n/1000000).toFixed(1)+'M';
   if (n >= 1000) return (n/1000).toFixed(1)+'K';
-  return n.toString();
+  return (n||0).toString();
+}
+
+function fmtObjective(o) {
+  const map = {
+    'MESSAGES':'Mensagens','CONVERSIONS':'Conversões','REACH':'Alcance',
+    'TRAFFIC':'Tráfego','ENGAGEMENT':'Engajamento','LEAD_GENERATION':'Leads',
+    'BRAND_AWARENESS':'Reconhecimento','VIDEO_VIEWS':'Visualizações de vídeo'
+  };
+  return map[o] || o || 'Campanha';
 }
 
 function setPeriod(p, el) {
