@@ -166,12 +166,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     </div>
     <div class="filter-summary" id="filter-summary"></div>
     <div id="dash-content"><div class="loading"><span class="spinner"></span>Carregando métricas...</div></div>
-    <div id="camp-btns-wrap" style="display:none;padding:0 1.25rem;margin-bottom:0.75rem">
-      <div class="camp-btns">
-        <div id="btn-ativas" class="camp-btn camp-btn-on" onclick="setCampFilter(true)">Ativas</div>
-        <div id="btn-todas" class="camp-btn" onclick="setCampFilter(false)">Todas</div>
-      </div>
-    </div>
+
   </div>
 </div>
 
@@ -221,7 +216,7 @@ async function loadDash() {
   if (m.error) { document.getElementById('dash-content').innerHTML = '<div class="loading">Erro ao carregar métricas.</div>'; return; }
   rawMetrics = m;
   accountStatus = m.accountStatus || 1;
-  document.getElementById('camp-btns-wrap').style.display = 'block';
+
   let initialCamps = m.campaigns || [];
   if (onlyActive) initialCamps = initialCamps.filter(c => {
     const isActive = c.effective_status === 'ACTIVE';
@@ -247,6 +242,14 @@ function renderDash(campaigns, daily, spendVal, impressionsVal, clicksVal, conve
 
   const maxVal = maxSpend.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
   const minVal = minSpend.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+
+  // Reaplica estado dos botões após render
+  setTimeout(() => {
+    const ba = document.getElementById('btn-ativas');
+    const bt = document.getElementById('btn-todas');
+    if (ba) ba.className = 'camp-btn' + (onlyActive ? ' camp-btn-on' : '');
+    if (bt) bt.className = 'camp-btn' + (!onlyActive ? ' camp-btn-on' : '');
+  }, 0);
 
   const campsHtml = (campaigns||[]).map(c => `
     <div class="camp-item" onclick="openCampaign('${c.id}','${c.name.replace(/'/g,"\\'").replace(/`/g,"'")}')">
@@ -460,7 +463,7 @@ function doLogout() {
   rawMetrics = null;
   sessionStorage.removeItem('metadash_email');
   document.getElementById('screen-dash').classList.remove('active');
-  document.getElementById('camp-btns-wrap').style.display = 'none';
+
   document.getElementById('screen-login').classList.add('active');
   document.getElementById('login-email').value = '';
   document.getElementById('avatar-menu').classList.remove('open');
