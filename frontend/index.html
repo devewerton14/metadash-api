@@ -95,11 +95,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .bar-label{font-size:8px;color:var(--text4);font-family:'DM Mono',monospace}
 .toggle-row{display:flex;align-items:center;justify-content:space-between;margin:0 1.25rem 0.75rem;padding:10px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:10px}
 .toggle-label{font-size:13px;color:var(--text);font-weight:500}
-.ios-toggle{position:relative;display:inline-block;width:51px;height:31px;flex-shrink:0;cursor:pointer}
-.ios-toggle-track{position:absolute;top:0;left:0;right:0;bottom:0;background:#55555599;border-radius:31px;transition:background 0.3s}
-.ios-toggle-thumb{position:absolute;width:27px;height:27px;left:2px;top:2px;background:#ffffff;border-radius:50%;transition:transform 0.3s;box-shadow:0 2px 5px rgba(0,0,0,0.4);z-index:2}
-.ios-toggle.active .ios-toggle-track{background:#34D399}
-.ios-toggle.active .ios-toggle-thumb{transform:translateX(20px)}
+.ios-toggle{display:inline-flex;align-items:center;width:52px;height:30px;border-radius:15px;background:#555;transition:background 0.3s;cursor:pointer;flex-shrink:0;padding:2px}
+.ios-toggle.active{background:#34D399}
+.ios-toggle-thumb{width:26px;height:26px;background:#fff;border-radius:50%;box-shadow:0 2px 4px rgba(0,0,0,0.4);transition:transform 0.3s;transform:translateX(0)}
+.ios-toggle.active .ios-toggle-thumb{transform:translateX(22px)}
 .camp-list{padding:0 1.25rem;margin-bottom:1rem;display:flex;flex-direction:column;gap:8px}
 .camp-item{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:1rem;display:flex;align-items:center;gap:12px;cursor:pointer;transition:border-color 0.15s}
 .camp-item:active{border-color:var(--purple)55}
@@ -296,7 +295,6 @@ function renderDash(campaigns, daily, spendVal, impressionsVal, clicksVal, conve
     <div class="toggle-row">
       <span class="toggle-label">Apenas campanhas ativas</span>
       <div class="ios-toggle active" id="toggle-active" onclick="toggleOnlyActive()">
-        <div class="ios-toggle-track"></div>
         <div class="ios-toggle-thumb"></div>
       </div>
     </div>
