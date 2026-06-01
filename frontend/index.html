@@ -95,10 +95,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .bar.today{background:var(--purple)}
 .bar-label{font-size:8px;color:var(--text4);font-family:'DM Mono',monospace}
 
-.camp-toggle-row{display:flex;align-items:center;justify-content:space-between;margin:0 1.25rem 0.75rem;padding:10px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;cursor:pointer}
-.camp-toggle-label{font-size:13px;font-weight:500;color:var(--text)}
-.camp-toggle-badge{font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:#555;color:#fff;transition:background 0.2s}
-.camp-toggle-badge.on{background:#34D399;color:#000}
+.camp-btns{display:flex;gap:8px;margin:0 1.25rem 0.75rem}
+.camp-btn{flex:1;padding:9px 0;border-radius:10px;font-size:13px;font-weight:500;text-align:center;cursor:pointer;border:1px solid #333;background:#14141C;color:#666}
+.camp-btn-on{background:#34D399;border-color:#34D399;color:#000}
 .camp-list{padding:0 1.25rem;margin-bottom:1rem;display:flex;flex-direction:column;gap:8px}
 .camp-item{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:1rem;display:flex;align-items:center;gap:12px;cursor:pointer;transition:border-color 0.15s}
 .camp-item:active{border-color:var(--purple)55}
@@ -292,9 +291,9 @@ function renderDash(campaigns, daily, spendVal, impressionsVal, clicksVal, conve
       </div>
     </div>
     <div class="section-title">Campanhas</div>
-    <div class="camp-toggle-row" onclick="toggleOnlyActive()">
-      <span class="camp-toggle-label">Mostrar campanhas</span>
-      <span class="camp-toggle-badge on" id="camp-badge">Apenas ativas</span>
+    <div class="camp-btns">
+      <div id="btn-ativas" class="camp-btn camp-btn-on" onclick="setCampFilter(true)">Ativas</div>
+      <div id="btn-todas" class="camp-btn" onclick="setCampFilter(false)">Todas</div>
     </div>
     <div class="camp-list">${campsHtml}</div>
   `;
@@ -419,16 +418,10 @@ function setPeriod(p, el) {
   loadDash();
 }
 
-function toggleOnlyActive() {
-  onlyActive = !onlyActive;
-  const badge = document.getElementById('camp-badge');
-  if (onlyActive) {
-    badge.textContent = 'Apenas ativas';
-    badge.className = 'camp-toggle-badge on';
-  } else {
-    badge.textContent = 'Todas';
-    badge.className = 'camp-toggle-badge';
-  }
+function setCampFilter(activeOnly) {
+  onlyActive = activeOnly;
+  document.getElementById('btn-ativas').className = 'camp-btn' + (activeOnly ? ' camp-btn-on' : '');
+  document.getElementById('btn-todas').className = 'camp-btn' + (!activeOnly ? ' camp-btn-on' : '');
   applyFilter();
 }
 
