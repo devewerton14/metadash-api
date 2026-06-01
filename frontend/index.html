@@ -584,6 +584,8 @@ window.addEventListener('load', async () => {
     if (btn) btn.textContent = '☀️';
   }
   currentPeriod = '7d';
+  document.querySelectorAll('.ptab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.ptab')[0].classList.add('active');
   const saved = sessionStorage.getItem('metadash_email');
   if (saved) {
     document.getElementById('login-email').value = saved;
