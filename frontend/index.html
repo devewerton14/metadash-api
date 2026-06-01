@@ -2,11 +2,15 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="theme-color" content="#0A0A0F"/>
 <title>MetaDash</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
+html,body{overflow-x:hidden;overscroll-behavior:none;touch-action:pan-y;max-width:100vw}
 body{font-family:'DM Sans',sans-serif;background:#0A0A0F;color:#F0EEF8;min-height:100vh}
 .screen{display:none}.screen.active{display:block}
 .login-wrap{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:2rem 1.5rem;max-width:420px;margin:0 auto}
@@ -84,6 +88,13 @@ body{font-family:'DM Sans',sans-serif;background:#0A0A0F;color:#F0EEF8;min-heigh
 
 <div class="screen active" id="screen-login">
   <div class="login-wrap">
+    <div style="margin-bottom:1.5rem"><svg width="120" height="32" viewBox="0 0 120 32" xmlns="http://www.w3.org/2000/svg">
+  <polygon points="16,2 30,28 2,28" fill="none" stroke="#1B9ED4" stroke-width="3"/>
+  <polygon points="16,6 27,26 5,26" fill="none" stroke="#F5A623" stroke-width="2.5"/>
+  <polygon points="16,10 24,24 8,24" fill="none" stroke="#E8403A" stroke-width="2"/>
+  <text x="36" y="12" font-family="Arial" font-size="8" fill="#888" font-weight="300">agencia</text>
+  <text x="36" y="26" font-family="Arial" font-size="16" fill="#1B9ED4" font-weight="700">triade</text>
+</svg></div>
     <div class="logo">meta<span>dash</span></div>
     <div class="tagline">Resultados dos seus anúncios, em tempo real.</div>
     <div class="error-msg" id="error-msg">E-mail não encontrado.</div>
@@ -96,7 +107,13 @@ body{font-family:'DM Sans',sans-serif;background:#0A0A0F;color:#F0EEF8;min-heigh
 
 <div class="screen" id="screen-dash">
   <div class="header">
-    <div class="header-logo">meta<span>dash</span></div>
+    <div style="display:flex;align-items:center;gap:10px"><svg width="120" height="32" viewBox="0 0 120 32" xmlns="http://www.w3.org/2000/svg">
+  <polygon points="16,2 30,28 2,28" fill="none" stroke="#1B9ED4" stroke-width="3"/>
+  <polygon points="16,6 27,26 5,26" fill="none" stroke="#F5A623" stroke-width="2.5"/>
+  <polygon points="16,10 24,24 8,24" fill="none" stroke="#E8403A" stroke-width="2"/>
+  <text x="36" y="12" font-family="Arial" font-size="8" fill="#888" font-weight="300">agencia</text>
+  <text x="36" y="26" font-family="Arial" font-size="16" fill="#1B9ED4" font-weight="700">triade</text>
+</svg><div class="header-logo">meta<span>dash</span></div></div>
     <div class="avatar" id="avatar" onclick="doLogout()">--</div>
   </div>
   <div class="dash">
