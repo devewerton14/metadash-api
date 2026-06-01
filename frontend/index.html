@@ -128,8 +128,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .chart-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem}
 .chart-title{font-size:13px;font-weight:500}
 .chart-meta{font-size:11px;color:var(--text3)}
-.bars{display:flex;align-items:flex-end;gap:3px;height:80px;min-height:80px;width:100%}
-.bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer}
+.bars{display:flex;align-items:flex-end;gap:2px;height:80px;min-height:80px;width:100%;overflow:hidden}
+.bar-wrap{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer}
 .bar{width:100%;border-radius:3px 3px 0 0;background:var(--purple)33;min-height:2px}
 .bar.today{background:var(--purple)}
 .bar-label{font-size:8px;color:var(--text4);font-family:'DM Mono',monospace}
@@ -306,7 +306,7 @@ function renderDash(campaigns, daily, spendVal, impressionsVal, clicksVal, conve
   const cpc = clicksVal > 0 ? (spendVal/clicksVal).toFixed(2) : '0.00';
   const maxSpend = Math.max(...(daily||[]).map(d=>d.spend), 1);
   const minSpend = Math.min(...(daily||[]).map(d=>d.spend));
-  const daily14 = (daily||[]).slice(-14);
+  const daily14 = (daily||[]);
 
   const barsHtml = daily14.map((d,i,arr) => {
     const h = Math.max(Math.round((d.spend/maxSpend)*76), 2);
@@ -358,7 +358,7 @@ function renderDash(campaigns, daily, spendVal, impressionsVal, clicksVal, conve
     </div>
     <div class="section-title">Gasto Diário</div>
     <div class="chart-card">
-      <div class="chart-header"><div class="chart-title">Gasto por dia</div><div class="chart-meta">${isFiltered?'Período filtrado':'Últimos 14 dias'}</div></div>
+      <div class="chart-header"><div class="chart-title">Gasto por dia</div><div class="chart-meta">${isFiltered?'Período filtrado':'Últimos '+currentPeriod.replace('d','')+' dias'}</div></div>
       <div style="display:flex;gap:8px;align-items:flex-end">
         <div style="display:flex;flex-direction:column;justify-content:space-between;height:92px;padding-bottom:16px;flex-shrink:0">
           <span style="font-size:9px;font-family:'DM Mono',monospace;color:var(--text3)">R$${maxVal}</span>
