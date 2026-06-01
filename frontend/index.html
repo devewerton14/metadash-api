@@ -55,6 +55,14 @@ body{font-family:'DM Sans',sans-serif;background:#0A0A0F;color:#F0EEF8;min-heigh
 @keyframes spin{to{transform:rotate(360deg)}}
 .client-name{padding:0.75rem 1.25rem 0.25rem;font-size:22px;font-weight:600;letter-spacing:-0.5px}
 
+/* FILTRO */
+.filter-bar{padding:0 1.25rem;margin-bottom:1rem;display:flex;flex-direction:column;gap:8px}
+.filter-input{width:100%;background:#14141C;border:1px solid #222230;border-radius:10px;padding:10px 14px;font-size:14px;font-family:'DM Sans',sans-serif;color:#F0EEF8;outline:none;transition:border-color 0.2s}
+.filter-input:focus{border-color:#7B61FF}
+.filter-dates{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.filter-active{background:#7B61FF18;border-color:#7B61FF55!important;color:#A692FF}
+.filter-clear{width:100%;background:transparent;border:1px solid #F87171;border-radius:10px;padding:8px;font-size:12px;font-family:'DM Sans',sans-serif;color:#F87171;cursor:pointer;display:none}
+.filter-summary{font-size:12px;color:#7B61FF;padding:0 1.25rem;margin-bottom:0.5rem;display:none}
 /* GRÁFICO */
 .chart-card{margin:0 1.25rem 1rem;background:#14141C;border:1px solid #1E1E2E;border-radius:16px;padding:1.25rem}
 .chart-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem}
@@ -141,6 +149,7 @@ const API = 'https://metadash-api.cjwrxp.easypanel.host';
 let currentClient = null;
 let currentPeriod = '30d';
 let currentAccountId = null;
+let rawMetrics = null;
 
 async function doLogin() {
   const email = document.getElementById('login-email').value.trim();
@@ -169,10 +178,15 @@ async function loadDash() {
   const metRes = await fetch(`${API}/metrics/${acc.id}?period=${currentPeriod}`);
   const m = await metRes.json();
   if (m.error) { document.getElementById('dash-content').innerHTML = '<div class="loading">Erro ao carregar métricas.</div>'; return; }
+  rawMetrics = m;
 
-  const cpc = m.clicks > 0 ? (parseFloat(m.spend)/m.clicks).toFixed(2) : '0.00';
-  const maxSpend = Math.max(...(m.daily||[]).map(d=>d.spend), 1);
-  const daily14 = (m.daily||[]).slice(-14);
+  renderDash(m, m.campaigns, m.daily, parseFloat(m.spend), m.impressions, m.clicks, false);
+}
+
+async function renderDash(m, campaigns, daily, spendVal, impressionsVal, clicksVal, isFiltered) {
+  const cpc = clicksVal > 0 ? (spendVal/clicksVal).toFixed(2) : '0.00';
+  const maxSpend = Math.max(...(daily||[]).map(d=>d.spend), 1);
+  const daily14 = (daily||[]).slice(-14);
   const minSpend = Math.min(...daily14.map(d=>d.spend));
   const barsHtml = daily14.map((d,i,arr) => {
     const h = Math.max(Math.round((d.spend/maxSpend)*76), 2);
@@ -184,7 +198,7 @@ async function loadDash() {
   const maxVal = maxSpend.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
   const minVal = minSpend.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
 
-  const campsHtml = (m.campaigns||[]).map(c => `
+  const campsHtml = (campaigns||[]).map(c => `
     <div class="camp-item" onclick="openCampaign('${c.id}','${c.name.replace(/'/g,"\\'")}')">
       <div class="camp-dot" style="background:${(c.effective_status==='ACTIVE'&&c.stop_time&&new Date(c.stop_time)<new Date())?'#F87171':c.effective_status==='ACTIVE'?'#34D399':c.effective_status==='PAUSED'?'#FACC15':c.effective_status==='ARCHIVED'?'#F87171':'#888'}"></div>
       <div class="camp-info">
@@ -193,20 +207,29 @@ async function loadDash() {
       </div>
       <div class="camp-arrow">›</div>
     </div>
-  `).join('') || '<div style="padding:1rem 1.25rem;font-size:13px;color:#555">Nenhuma campanha ativa</div>';
+  `).join('') || `<div style="padding:1rem 1.25rem;font-size:13px;color:#555">${isFiltered ? 'Nenhuma campanha encontrada para esse filtro' : 'Nenhuma campanha ativa'}</div>`;
 
   document.getElementById('dash-content').innerHTML = `
     <div class="client-name">${currentClient.name}</div>
     <div class="hero">
       <div class="hero-label">Valor Gasto</div>
-      <div class="hero-value"><span class="hero-currency">R$ </span>${parseFloat(m.spend).toLocaleString('pt-BR',{minimumFractionDigits:2})}</div>
-      <div class="delta">Últimos ${currentPeriod === '7d' ? '7' : currentPeriod === '30d' ? '30' : '90'} dias</div>
+      <div class="hero-value"><span class="hero-currency">R$ </span>${spendVal.toLocaleString('pt-BR',{minimumFractionDigits:2})}</div>
+      <div class="delta">${isFiltered ? 'Período filtrado' : 'Últimos ' + (currentPeriod === '7d' ? '7' : currentPeriod === '30d' ? '30' : '90') + ' dias'}</div>
     </div>
+    <div class="filter-bar">
+      <input class="filter-input" type="text" id="filter-name" placeholder="🔍 Buscar campanha..." oninput="applyFilter()"/>
+      <div class="filter-dates">
+        <input class="filter-input" type="date" id="filter-start" onchange="applyFilter()" title="Data início"/>
+        <input class="filter-input" type="date" id="filter-end" onchange="applyFilter()" title="Data fim"/>
+      </div>
+      <button class="filter-clear" id="filter-clear" onclick="clearFilter()">✕ Limpar filtro</button>
+    </div>
+    <div class="filter-summary" id="filter-summary"></div>
     <div class="section-title">Visão Geral</div>
     <div class="metrics-grid">
-      <div class="metric-card"><div class="mc-label">Alcance</div><div class="mc-value">${fmtNum(m.reach)}</div><div class="mc-sub">pessoas únicas</div></div>
-      <div class="metric-card"><div class="mc-label">Impressões</div><div class="mc-value">${fmtNum(m.impressions)}</div><div class="mc-sub">exibições</div></div>
-      <div class="metric-card"><div class="mc-label">Cliques</div><div class="mc-value">${fmtNum(m.clicks)}</div><div class="mc-sub up">CTR ${m.ctr}%</div></div>
+      <div class="metric-card"><div class="mc-label">Alcance</div><div class="mc-value">${fmtNum(impressionsVal > 0 ? m.reach : 0)}</div><div class="mc-sub">pessoas únicas</div></div>
+      <div class="metric-card"><div class="mc-label">Impressões</div><div class="mc-value">${fmtNum(impressionsVal)}</div><div class="mc-sub">exibições</div></div>
+      <div class="metric-card"><div class="mc-label">Cliques</div><div class="mc-value">${fmtNum(clicksVal)}</div><div class="mc-sub up">CTR ${impressionsVal > 0 ? ((clicksVal/impressionsVal)*100).toFixed(2) : 0}%</div></div>
       <div class="metric-card"><div class="mc-label">CPM</div><div class="mc-value">R$ ${parseFloat(m.cpm).toLocaleString('pt-BR',{minimumFractionDigits:2})}</div><div class="mc-sub">por mil impressões</div></div>
       <div class="metric-card"><div class="mc-label">Conversas</div><div class="mc-value">${fmtNum(m.conversations)}</div><div class="mc-sub purple">WhatsApp iniciadas</div></div>
       <div class="metric-card"><div class="mc-label">CPC</div><div class="mc-value">R$ ${cpc}</div><div class="mc-sub">custo por clique</div></div>
@@ -242,7 +265,11 @@ async function openCampaign(campId, campName) {
     return;
   }
 
-  const cpc = m.clicks > 0 ? (parseFloat(m.spend)/m.clicks).toFixed(2) : '0.00';
+  renderDash(m, m.campaigns, m.daily, parseFloat(m.spend), m.impressions, m.clicks, false);
+}
+
+async function renderDash(m, campaigns, daily, spendVal, impressionsVal, clicksVal, isFiltered) {
+  const cpc = clicksVal > 0 ? (spendVal/clicksVal).toFixed(2) : '0.00';
 
   document.getElementById('modal-content').innerHTML = `
     <div class="modal-title">${campName}</div>
@@ -250,9 +277,9 @@ async function openCampaign(campId, campName) {
     <div class="modal-grid">
       <div class="modal-card"><div class="mc-label">Gasto</div><div class="mc-value">R$ ${parseFloat(m.spend).toLocaleString('pt-BR',{minimumFractionDigits:2})}</div></div>
       <div class="modal-card"><div class="mc-label">Alcance</div><div class="mc-value">${fmtNum(m.reach)}</div></div>
-      <div class="modal-card"><div class="mc-label">Impressões</div><div class="mc-value">${fmtNum(m.impressions)}</div></div>
+      <div class="modal-card"><div class="mc-label">Impressões</div><div class="mc-value">${fmtNum(impressionsVal)}</div></div>
       <div class="modal-card"><div class="mc-label">Frequência</div><div class="mc-value">${m.frequency}×</div></div>
-      <div class="modal-card"><div class="mc-label">Cliques</div><div class="mc-value">${fmtNum(m.clicks)}</div><div class="mc-sub up">CTR ${m.ctr}%</div></div>
+      <div class="modal-card"><div class="mc-label">Cliques</div><div class="mc-value">${fmtNum(clicksVal)}</div><div class="mc-sub up">CTR ${impressionsVal > 0 ? ((clicksVal/impressionsVal)*100).toFixed(2) : 0}%</div></div>
       <div class="modal-card"><div class="mc-label">CPM</div><div class="mc-value">R$ ${parseFloat(m.cpm).toLocaleString('pt-BR',{minimumFractionDigits:2})}</div></div>
       <div class="modal-card"><div class="mc-label">Conversas</div><div class="mc-value">${fmtNum(m.conversations)}</div><div class="mc-sub purple">WhatsApp</div></div>
       <div class="modal-card"><div class="mc-label">CPC</div><div class="mc-value">R$ ${cpc}</div></div>
@@ -268,6 +295,66 @@ function closeModal(e) {
 function showBarTip(el, val) {
   const tip = document.getElementById('bar-tip');
   if (tip) { tip.textContent = val; setTimeout(()=>tip.textContent='', 2000); }
+}
+
+function applyFilter() {
+  if (!rawMetrics) return;
+  const name = document.getElementById('filter-name').value.toLowerCase().trim();
+  const start = document.getElementById('filter-start').value;
+  const end = document.getElementById('filter-end').value;
+  const clearBtn = document.getElementById('filter-clear');
+  const summary = document.getElementById('filter-summary');
+  const hasFilter = name || start || end;
+
+  clearBtn.style.display = hasFilter ? 'block' : 'none';
+
+  // Filtra campanhas por nome
+  let camps = rawMetrics.campaigns || [];
+  if (name) camps = camps.filter(c => c.name.toLowerCase().includes(name));
+
+  // Filtra gasto diário por data
+  let daily = rawMetrics.daily || [];
+  if (start) daily = daily.filter(d => d.date >= start);
+  if (end) daily = daily.filter(d => d.date <= end);
+
+  // Valida limite 90 dias
+  if (start && end) {
+    const diff = (new Date(end) - new Date(start)) / (1000*60*60*24);
+    if (diff > 90) {
+      document.getElementById('filter-end').classList.add('filter-active');
+      summary.style.display = 'block';
+      summary.textContent = '⚠️ Período máximo de 90 dias';
+      summary.style.color = '#F87171';
+      return;
+    }
+  }
+
+  // Recalcula métricas filtradas
+  const filteredSpend = daily.reduce((a, d) => a + d.spend, 0);
+  const filteredImpressions = daily.reduce((a, d) => a + d.impressions, 0);
+  const filteredClicks = daily.reduce((a, d) => a + d.clicks, 0);
+
+  if (hasFilter) {
+    summary.style.display = 'block';
+    summary.style.color = '#7B61FF';
+    const parts = [];
+    if (name) parts.push(`"${name}": ${camps.length} campanha(s)`);
+    if (start || end) parts.push(`período filtrado`);
+    summary.textContent = '✓ Filtro ativo — ' + parts.join(' · ');
+  } else {
+    summary.style.display = 'none';
+  }
+
+  renderDash(rawMetrics, camps, daily, filteredSpend, filteredImpressions, filteredClicks, hasFilter);
+}
+
+function clearFilter() {
+  document.getElementById('filter-name').value = '';
+  document.getElementById('filter-start').value = '';
+  document.getElementById('filter-end').value = '';
+  document.getElementById('filter-clear').style.display = 'none';
+  document.getElementById('filter-summary').style.display = 'none';
+  if (rawMetrics) renderDash(rawMetrics, rawMetrics.campaigns, rawMetrics.daily, parseFloat(rawMetrics.spend), rawMetrics.impressions, rawMetrics.clicks, false);
 }
 
 function fmtNum(n) {
