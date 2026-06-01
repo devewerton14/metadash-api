@@ -583,6 +583,7 @@ window.addEventListener('load', async () => {
     const btn = document.getElementById('theme-btn');
     if (btn) btn.textContent = '☀️';
   }
+  currentPeriod = '7d';
   const saved = sessionStorage.getItem('metadash_email');
   if (saved) {
     document.getElementById('login-email').value = saved;
