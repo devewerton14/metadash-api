@@ -33,6 +33,45 @@
   --shadow:#00000022;
 }
 html,body{overflow-x:hidden;overscroll-behavior:none;touch-action:pan-y;max-width:100vw}
+
+@media(min-width:768px){
+  body{display:flex;flex-direction:column;height:100vh}
+  .header{max-width:100%!important;width:100%}
+  .screen.active#screen-dash{display:flex;flex-direction:column;flex:1;overflow:hidden}
+  .dash-layout{display:flex;flex:1;overflow:hidden}
+  .sidebar{width:260px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--border);padding:1.5rem 1.25rem;overflow-y:auto;display:flex;flex-direction:column;gap:1rem}
+  .dash-main{flex:1;overflow-y:auto;padding:1.5rem}
+  .dash{max-width:100%!important;padding-bottom:0}
+  .period-tabs{padding:0 0 0.5rem}
+  .filter-bar{padding:0;margin-bottom:0}
+  .filter-summary{padding:0;margin-bottom:0.5rem}
+  .filter-clear{margin-top:0.25rem}
+  .metrics-grid{grid-template-columns:repeat(4,1fr)!important;padding:0;margin-bottom:1.25rem}
+  .hero{margin:0 0 1.25rem}
+  .section-title{padding:0.5rem 0}
+  .chart-card{margin:0 0 1.25rem}
+  .camp-list{padding:0;display:grid!important;grid-template-columns:repeat(2,1fr);gap:8px}
+  .client-name{padding:0 0 0.5rem;font-size:26px}
+  .sidebar-title{font-size:11px;text-transform:uppercase;letter-spacing:1.2px;color:var(--text3);font-weight:500;margin-bottom:0.25rem}
+  .sidebar-nav{display:flex;flex-direction:column;gap:4px}
+  .sidebar-nav-item{padding:10px 12px;border-radius:10px;font-size:13px;font-weight:500;color:var(--text3);cursor:pointer;transition:all 0.15s;display:flex;align-items:center;gap:8px}
+  .sidebar-nav-item:hover{background:var(--bg3);color:var(--text)}
+  .sidebar-nav-item.active{background:var(--purple-dim);color:var(--purple)}
+  .sidebar-divider{height:1px;background:var(--border);margin:0.5rem 0}
+  #dash-content{padding:0}
+  .camp-btns-desktop{display:flex;gap:6px;margin-bottom:0.75rem}
+  .camp-btns-desktop .cb-btn{flex:1;padding:8px 0;border-radius:10px;font-size:12px;font-weight:600;text-align:center;cursor:pointer;background:transparent;border:2px solid var(--border2);color:var(--text3)}
+  .mobile-only{display:none!important}
+  .desktop-only{display:block!important}
+}
+
+@media(max-width:767px){
+  .dash-layout{display:block}
+  .sidebar{display:none}
+  .dash-main{padding:0}
+  .desktop-only{display:none!important}
+  .mobile-only{display:block}
+}
 body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
 .screen{display:none}.screen.active{display:block}
 .login-wrap{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:2rem 1.5rem;max-width:420px;margin:0 auto;background:#0A0A0F}
@@ -150,8 +189,43 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
       </div>
     </div>
   </div>
-  <div class="dash">
-    <div class="period-tabs">
+  <div class="dash-layout">
+    <aside class="sidebar">
+      <div>
+        <div class="sidebar-title">Menu</div>
+        <div class="sidebar-nav">
+          <div class="sidebar-nav-item active">📊 Dashboard</div>
+        </div>
+      </div>
+      <div class="sidebar-divider"></div>
+      <div>
+        <div class="sidebar-title">Período</div>
+        <div class="period-tabs" style="flex-direction:column;gap:4px;padding:0">
+          <button class="ptab desktop-period" onclick="setPeriod('7d',this)">7 dias</button>
+          <button class="ptab desktop-period active" onclick="setPeriod('30d',this)">30 dias</button>
+          <button class="ptab desktop-period" onclick="setPeriod('90d',this)">90 dias</button>
+        </div>
+      </div>
+      <div class="sidebar-divider"></div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div class="sidebar-title">Filtros</div>
+        <input class="filter-input" type="text" id="filter-name-desk" placeholder="🔍 Buscar campanha..." oninput="syncFilter('name')"/>
+        <input class="filter-input" type="date" id="filter-start-desk" onchange="syncFilter('start')" placeholder="Data início"/>
+        <input class="filter-input" type="date" id="filter-end-desk" onchange="syncFilter('end')"/>
+        <button class="filter-clear" id="filter-clear-desk" onclick="clearFilter()" style="display:none">✕ Limpar filtro</button>
+      </div>
+      <div class="sidebar-divider"></div>
+      <div>
+        <div class="sidebar-title">Campanhas</div>
+        <div style="display:flex;flex-direction:column;gap:6px;margin-top:0.25rem">
+          <div id="sb-btn-ativas" style="padding:8px 12px;border-radius:10px;font-size:12px;font-weight:600;text-align:center;cursor:pointer;background:#34D399;border:2px solid #34D399;color:#000" onclick="setCampFilter(true)">● Apenas ativas</div>
+          <div id="sb-btn-todas" style="padding:8px 12px;border-radius:10px;font-size:12px;font-weight:600;text-align:center;cursor:pointer;background:transparent;border:2px solid #333;color:#555" onclick="setCampFilter(false)">○ Todas</div>
+        </div>
+      </div>
+    </aside>
+    <div class="dash-main">
+      <div class="dash mobile-period-tabs">
+    <div class="period-tabs mobile-only">
       <button class="ptab" onclick="setPeriod('7d',this)">7 dias</button>
       <button class="ptab active" onclick="setPeriod('30d',this)">30 dias</button>
       <button class="ptab" onclick="setPeriod('90d',this)">90 dias</button>
@@ -167,6 +241,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     <div class="filter-summary" id="filter-summary"></div>
     <div id="dash-content"><div class="loading"><span class="spinner"></span>Carregando métricas...</div></div>
 
+      </div>
+    </div>
   </div>
 </div>
 
@@ -300,6 +376,24 @@ function renderDash(campaigns, daily, spendVal, impressionsVal, clicksVal, conve
   `;
 }
 
+function syncFilter(type) {
+  const desk = {
+    name: document.getElementById('filter-name-desk'),
+    start: document.getElementById('filter-start-desk'),
+    end: document.getElementById('filter-end-desk')
+  };
+  const mob = {
+    name: document.getElementById('filter-name'),
+    start: document.getElementById('filter-start'),
+    end: document.getElementById('filter-end')
+  };
+  if (desk[type] && mob[type]) mob[type].value = desk[type].value;
+  applyFilter();
+  const hasFilter = (mob.name&&mob.name.value)||(mob.start&&mob.start.value)||(mob.end&&mob.end.value);
+  const clearDesk = document.getElementById('filter-clear-desk');
+  if (clearDesk) clearDesk.style.display = hasFilter ? 'block' : 'none';
+}
+
 function applyFilter() {
   if (!rawMetrics) return;
   const name = document.getElementById('filter-name').value.toLowerCase().trim();
@@ -426,13 +520,18 @@ function setCampFilter(activeOnly) {
 }
 
 function updateCampButtons() {
+  const onStyle = 'padding:9px 0;border-radius:10px;font-size:13px;font-weight:600;text-align:center;cursor:pointer;background:#34D399;border:2px solid #34D399;color:#000;flex:1';
+  const offStyle = 'padding:9px 0;border-radius:10px;font-size:13px;font-weight:600;text-align:center;cursor:pointer;background:transparent;border:2px solid #333;color:#555;flex:1';
+  const onStyleSb = 'padding:8px 12px;border-radius:10px;font-size:12px;font-weight:600;text-align:center;cursor:pointer;background:#34D399;border:2px solid #34D399;color:#000';
+  const offStyleSb = 'padding:8px 12px;border-radius:10px;font-size:12px;font-weight:600;text-align:center;cursor:pointer;background:transparent;border:2px solid #333;color:#555';
   const ba = document.getElementById('cb-ativas');
   const bt = document.getElementById('cb-todas');
-  if (!ba || !bt) return;
-  const onStyle = 'flex:1;padding:9px 0;border-radius:10px;font-size:13px;font-weight:600;text-align:center;cursor:pointer;background:#34D399;border:2px solid #34D399;color:#000';
-  const offStyle = 'flex:1;padding:9px 0;border-radius:10px;font-size:13px;font-weight:600;text-align:center;cursor:pointer;background:transparent;border:2px solid #333;color:#555';
-  ba.style.cssText = onlyActive ? onStyle : offStyle;
-  bt.style.cssText = !onlyActive ? onStyle : offStyle;
+  if (ba) ba.style.cssText = onlyActive ? onStyle : offStyle;
+  if (bt) bt.style.cssText = !onlyActive ? onStyle : offStyle;
+  const sba = document.getElementById('sb-btn-ativas');
+  const sbt = document.getElementById('sb-btn-todas');
+  if (sba) sba.style.cssText = onlyActive ? onStyleSb : offStyleSb;
+  if (sbt) sbt.style.cssText = !onlyActive ? onStyleSb : offStyleSb;
 }
 
 function toggleTheme() {
