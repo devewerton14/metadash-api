@@ -109,8 +109,8 @@ app.get('/metrics/:accountId', async (req, res) => {
       campaigns,
     });
   } catch (err) {
-    console.error(err?.response?.data || err.message);
-    res.status(500).json({ error: 'Erro ao buscar métricas na Meta' });
+    console.error(JSON.stringify(err?.response?.data || err.message));
+    res.status(500).json({ error: 'Erro ao buscar métricas na Meta', detail: err?.response?.data || err.message });
   }
 });
 
