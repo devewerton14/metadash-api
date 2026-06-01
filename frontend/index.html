@@ -301,7 +301,7 @@ function renderDash(campaigns, daily, spendVal, impressionsVal, clicksVal, conve
       </div>
     </div>
     <div class="section-title">Campanhas</div>
-
+    <div style="display:flex;gap:8px;padding:0 1.25rem;margin-bottom:0.75rem"><div style="flex:1;padding:9px 0;border-radius:10px;font-size:13px;font-weight:600;text-align:center;cursor:pointer;border:2px solid ${onlyActive?'#34D399':'#333'};background:${onlyActive?'#34D399':'transparent'};color:${onlyActive?'#000':'#555'}" onclick="setCampFilter(true)">Ativas</div><div style="flex:1;padding:9px 0;border-radius:10px;font-size:13px;font-weight:600;text-align:center;cursor:pointer;border:2px solid ${!onlyActive?'#34D399':'#333'};background:${!onlyActive?'#34D399':'transparent'};color:${!onlyActive?'#000':'#555'}" onclick="setCampFilter(false)">Todas</div></div>
     <div class="camp-list">${campsHtml}</div>
   `;
 }
