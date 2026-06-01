@@ -24,19 +24,25 @@ body{font-family:'DM Sans',sans-serif;background:#0A0A0F;color:#F0EEF8;min-heigh
 .btn:active{transform:scale(0.98);opacity:0.9}
 .hint{font-size:12px;color:#555;text-align:center;margin-top:1.5rem}
 .error-msg{background:#3D1515;color:#F87171;padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:1rem;display:none}
-.header{padding:1rem 1.25rem 0.75rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:#0A0A0FEE;backdrop-filter:blur(12px);z-index:10;border-bottom:1px solid #14141C}
-.header-logo{font-size:18px;font-weight:600;letter-spacing:-0.3px}.header-logo span{color:#7B61FF}
+.header{padding:0.75rem 1.25rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:#0A0A0FEE;backdrop-filter:blur(12px);z-index:10;border-bottom:1px solid #14141C}
+.header-logo{font-size:16px;font-weight:600;letter-spacing:-0.3px}.header-logo span{color:#7B61FF}
 .avatar{width:32px;height:32px;border-radius:50%;background:#7B61FF22;border:1.5px solid #7B61FF44;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#7B61FF;cursor:pointer}
-.avatar-menu{position:absolute;top:52px;right:1.25rem;background:#14141C;border:1px solid #1E1E2E;border-radius:12px;padding:0.5rem;min-width:160px;z-index:100;display:none;box-shadow:0 8px 24px #00000066}
+.avatar-wrap{position:relative}
+.avatar-menu{position:absolute;top:40px;right:0;background:#14141C;border:1px solid #1E1E2E;border-radius:12px;padding:0.5rem;min-width:160px;z-index:100;display:none;box-shadow:0 8px 24px #00000066}
 .avatar-menu.open{display:block}
-.avatar-menu-name{font-size:13px;font-weight:500;padding:8px 12px;color:#888;border-bottom:1px solid #1E1E2E;margin-bottom:4px}
-.avatar-menu-item{display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:8px;font-size:13px;cursor:pointer;color:#F0EEF8;transition:background 0.15s}
+.avatar-menu-name{font-size:13px;padding:8px 12px;color:#888;border-bottom:1px solid #1E1E2E;margin-bottom:4px}
+.avatar-menu-item{display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:8px;font-size:13px;cursor:pointer;color:#F87171;transition:background 0.15s}
 .avatar-menu-item:hover{background:#1E1E2E}
-.avatar-menu-item.danger{color:#F87171}
 .dash{max-width:420px;margin:0 auto;padding-bottom:2rem}
 .period-tabs{padding:0.75rem 1.25rem;display:flex;gap:4px}
 .ptab{flex:1;text-align:center;padding:6px 0;font-size:12px;font-weight:500;border-radius:8px;cursor:pointer;color:#555;transition:all 0.15s;border:none;background:none}
 .ptab.active{background:#14141C;color:#F0EEF8}
+.filter-bar{padding:0 1.25rem;margin-bottom:0.75rem;display:flex;flex-direction:column;gap:8px}
+.filter-input{width:100%;background:#14141C;border:1px solid #222230;border-radius:10px;padding:10px 14px;font-size:14px;font-family:'DM Sans',sans-serif;color:#F0EEF8;outline:none;transition:border-color 0.2s}
+.filter-input:focus{border-color:#7B61FF}
+.filter-dates{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.filter-clear{width:100%;background:transparent;border:1px solid #F87171;border-radius:10px;padding:8px;font-size:12px;font-family:'DM Sans',sans-serif;color:#F87171;cursor:pointer;display:none}
+.filter-summary{font-size:12px;color:#7B61FF;padding:0 1.25rem;margin-bottom:0.5rem;display:none}
 .hero{margin:0.5rem 1.25rem 1rem;background:#14141C;border-radius:16px;padding:1.25rem;border:1px solid #1E1E2E;position:relative;overflow:hidden}
 .hero::before{content:'';position:absolute;top:-40px;right:-40px;width:120px;height:120px;background:#7B61FF15;border-radius:50%}
 .hero-label{font-size:11px;text-transform:uppercase;letter-spacing:1.2px;color:#555;margin-bottom:4px}
@@ -54,37 +60,23 @@ body{font-family:'DM Sans',sans-serif;background:#0A0A0F;color:#F0EEF8;min-heigh
 .spinner{display:inline-block;width:20px;height:20px;border:2px solid #333;border-top-color:#7B61FF;border-radius:50%;animation:spin 0.8s linear infinite;margin-right:8px;vertical-align:middle}
 @keyframes spin{to{transform:rotate(360deg)}}
 .client-name{padding:0.75rem 1.25rem 0.25rem;font-size:22px;font-weight:600;letter-spacing:-0.5px}
-
-/* FILTRO */
-.filter-bar{padding:0 1.25rem;margin-bottom:1rem;display:flex;flex-direction:column;gap:8px}
-.filter-input{width:100%;background:#14141C;border:1px solid #222230;border-radius:10px;padding:10px 14px;font-size:14px;font-family:'DM Sans',sans-serif;color:#F0EEF8;outline:none;transition:border-color 0.2s}
-.filter-input:focus{border-color:#7B61FF}
-.filter-dates{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.filter-active{background:#7B61FF18;border-color:#7B61FF55!important;color:#A692FF}
-.filter-clear{width:100%;background:transparent;border:1px solid #F87171;border-radius:10px;padding:8px;font-size:12px;font-family:'DM Sans',sans-serif;color:#F87171;cursor:pointer;display:none}
-.filter-summary{font-size:12px;color:#7B61FF;padding:0 1.25rem;margin-bottom:0.5rem;display:none}
-/* GRÁFICO */
 .chart-card{margin:0 1.25rem 1rem;background:#14141C;border:1px solid #1E1E2E;border-radius:16px;padding:1.25rem}
 .chart-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem}
 .chart-title{font-size:13px;font-weight:500}
 .chart-meta{font-size:11px;color:#555}
 .bars{display:flex;align-items:flex-end;gap:3px;height:80px}
-.bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px}
+.bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer}
 .bar{width:100%;border-radius:3px 3px 0 0;background:#7B61FF33;min-height:2px}
 .bar.today{background:#7B61FF}
 .bar-label{font-size:8px;color:#444;font-family:'DM Mono',monospace}
-
-/* CAMPANHAS */
 .camp-list{padding:0 1.25rem;margin-bottom:1rem;display:flex;flex-direction:column;gap:8px}
 .camp-item{background:#14141C;border:1px solid #1E1E2E;border-radius:12px;padding:1rem;display:flex;align-items:center;gap:12px;cursor:pointer;transition:border-color 0.15s}
 .camp-item:active{border-color:#7B61FF55}
-.camp-dot{width:8px;height:8px;border-radius:50%;background:#34D399;flex-shrink:0}
+.camp-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
 .camp-info{flex:1;min-width:0}
 .camp-name{font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .camp-type{font-size:11px;color:#555;margin-top:2px}
 .camp-arrow{font-size:16px;color:#444}
-
-/* MODAL */
 .modal-overlay{position:fixed;inset:0;background:#000000CC;z-index:100;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.25s}
 .modal-overlay.open{opacity:1;pointer-events:all}
 .modal{background:#0F0F18;border-radius:20px 20px 0 0;width:100%;max-width:420px;padding:1.5rem 1.25rem 2.5rem;transform:translateY(100%);transition:transform 0.3s cubic-bezier(.34,1.56,.64,1);max-height:85vh;overflow-y:auto}
@@ -103,7 +95,7 @@ body{font-family:'DM Sans',sans-serif;background:#0A0A0F;color:#F0EEF8;min-heigh
 
 <div class="screen active" id="screen-login">
   <div class="login-wrap">
-        <img src="https://gptriade.com.br/wp-content/uploads/2023/01/Logo-Triade-1-300x100.png" style="height:36px;width:auto;margin-bottom:1.5rem;display:block;align-self:flex-start;" alt="Agência Tríade"/>
+    <img src="https://gptriade.com.br/wp-content/uploads/2023/01/Logo-Triade-1-300x100.png" style="height:36px;width:auto;margin-bottom:1.5rem;display:block;align-self:flex-start;" alt="Agência Tríade"/>
     <div class="logo">meta<span>dash</span></div>
     <div class="tagline">Resultados dos seus anúncios, em tempo real.</div>
     <div class="error-msg" id="error-msg">E-mail não encontrado.</div>
@@ -116,14 +108,17 @@ body{font-family:'DM Sans',sans-serif;background:#0A0A0F;color:#F0EEF8;min-heigh
 
 <div class="screen" id="screen-dash">
   <div class="header">
-    <div style="display:flex;align-items:center;gap:10px"><img src="https://gptriade.com.br/wp-content/uploads/2023/01/Logo-Triade-1-300x100.png" style="height:24px;width:auto;" alt="Agência Tríade"/></div>
-    <div style="display:flex;align-items:center;gap:12px"><div class="header-logo">meta<span>dash</span></div><div class="avatar" id="avatar" onclick="toggleMenu()">--</div>
-      <div class="avatar-menu" id="avatar-menu">
-        <div class="avatar-menu-name" id="menu-name">--</div>
-        <div class="avatar-menu-item danger" onclick="doLogout()">
-          <span>&#x2192;</span> Sair
+    <img src="https://gptriade.com.br/wp-content/uploads/2023/01/Logo-Triade-1-300x100.png" style="height:24px;width:auto;" alt="Agência Tríade"/>
+    <div style="display:flex;align-items:center;gap:12px">
+      <div class="header-logo">meta<span>dash</span></div>
+      <div class="avatar-wrap">
+        <div class="avatar" id="avatar" onclick="toggleMenu()">--</div>
+        <div class="avatar-menu" id="avatar-menu">
+          <div class="avatar-menu-name" id="menu-name">--</div>
+          <div class="avatar-menu-item" onclick="doLogout()">&#x2192; Sair</div>
         </div>
-      </div></div>
+      </div>
+    </div>
   </div>
   <div class="dash">
     <div class="period-tabs">
@@ -131,11 +126,19 @@ body{font-family:'DM Sans',sans-serif;background:#0A0A0F;color:#F0EEF8;min-heigh
       <button class="ptab active" onclick="setPeriod('30d',this)">30 dias</button>
       <button class="ptab" onclick="setPeriod('90d',this)">90 dias</button>
     </div>
+    <div class="filter-bar">
+      <input class="filter-input" type="text" id="filter-name" placeholder="🔍 Buscar campanha..." oninput="applyFilter()"/>
+      <div class="filter-dates">
+        <input class="filter-input" type="date" id="filter-start" onchange="applyFilter()"/>
+        <input class="filter-input" type="date" id="filter-end" onchange="applyFilter()"/>
+      </div>
+      <button class="filter-clear" id="filter-clear" onclick="clearFilter()">✕ Limpar filtro</button>
+    </div>
+    <div class="filter-summary" id="filter-summary"></div>
     <div id="dash-content"><div class="loading"><span class="spinner"></span>Carregando métricas...</div></div>
   </div>
 </div>
 
-<!-- MODAL CAMPANHA -->
 <div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
   <div class="modal" id="modal">
     <div class="modal-handle"></div>
@@ -145,7 +148,7 @@ body{font-family:'DM Sans',sans-serif;background:#0A0A0F;color:#F0EEF8;min-heigh
 </div>
 
 <script>
-const API = 'https://metadash-api.cjwrxp.easypanel.host';
+const API = 'https://api.gptriade.com.br';
 let currentClient = null;
 let currentPeriod = '30d';
 let currentAccountId = null;
@@ -179,64 +182,56 @@ async function loadDash() {
   const m = await metRes.json();
   if (m.error) { document.getElementById('dash-content').innerHTML = '<div class="loading">Erro ao carregar métricas.</div>'; return; }
   rawMetrics = m;
-
-  renderDash(m, m.campaigns, m.daily, parseFloat(m.spend), m.impressions, m.clicks, false);
+  renderDash(m.campaigns, m.daily, parseFloat(m.spend), m.impressions, m.clicks, m.conversations, m.reach, m.ctr, m.cpm, false);
 }
 
-async function renderDash(m, campaigns, daily, spendVal, impressionsVal, clicksVal, isFiltered) {
+function renderDash(campaigns, daily, spendVal, impressionsVal, clicksVal, conversationsVal, reachVal, ctrVal, cpmVal, isFiltered) {
   const cpc = clicksVal > 0 ? (spendVal/clicksVal).toFixed(2) : '0.00';
   const maxSpend = Math.max(...(daily||[]).map(d=>d.spend), 1);
+  const minSpend = Math.min(...(daily||[]).map(d=>d.spend));
   const daily14 = (daily||[]).slice(-14);
-  const minSpend = Math.min(...daily14.map(d=>d.spend));
+
   const barsHtml = daily14.map((d,i,arr) => {
     const h = Math.max(Math.round((d.spend/maxSpend)*76), 2);
     const isLast = i === arr.length-1;
     const day = new Date(d.date).getDate();
     const val = d.spend.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
-    return `<div class="bar-wrap" title="R$ ${val}" onclick="showBarTip(this,'R$ ${val}')"><div class="bar${isLast?' today':''}" style="height:${h}px"></div><div class="bar-label">${day}</div></div>`;
+    return `<div class="bar-wrap" onclick="showBarTip(this,'R$ ${val}')"><div class="bar${isLast?' today':''}" style="height:${h}px"></div><div class="bar-label">${day}</div></div>`;
   }).join('');
+
   const maxVal = maxSpend.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
   const minVal = minSpend.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
 
   const campsHtml = (campaigns||[]).map(c => `
-    <div class="camp-item" onclick="openCampaign('${c.id}','${c.name.replace(/'/g,"\\'")}')">
-      <div class="camp-dot" style="background:${(c.effective_status==='ACTIVE'&&c.stop_time&&new Date(c.stop_time)<new Date())?'#F87171':c.effective_status==='ACTIVE'?'#34D399':c.effective_status==='PAUSED'?'#FACC15':c.effective_status==='ARCHIVED'?'#F87171':'#888'}"></div>
+    <div class="camp-item" onclick="openCampaign('${c.id}','${c.name.replace(/'/g,"\\'").replace(/`/g,"'")}')">
+      <div class="camp-dot" style="background:${c.effective_status==='ACTIVE'?'#34D399':c.effective_status==='PAUSED'?'#FACC15':'#F87171'}"></div>
       <div class="camp-info">
         <div class="camp-name">${c.name}</div>
-        <div class="camp-type">${fmtObjective(c.objective)} · <span style="color:${(c.effective_status==='ACTIVE'&&c.stop_time&&new Date(c.stop_time)<new Date())?'#F87171':c.effective_status==='ACTIVE'?'#34D399':c.effective_status==='PAUSED'?'#FACC15':c.effective_status==='ARCHIVED'?'#F87171':'#888'};font-size:10px">${(c.effective_status==='ACTIVE'&&c.stop_time&&new Date(c.stop_time)<new Date())?'Concluída':c.effective_status==='ACTIVE'?'Ativa':c.effective_status==='PAUSED'?'Pausada':c.effective_status==='ARCHIVED'?'Concluída':'Inativa'}</span></div>
+        <div class="camp-type">${fmtObjective(c.objective)} · <span style="color:${c.effective_status==='ACTIVE'?'#34D399':c.effective_status==='PAUSED'?'#FACC15':'#F87171'};font-size:10px">${(c.effective_status==='ACTIVE'&&c.stop_time&&new Date(c.stop_time)<new Date())?'Concluída':c.effective_status==='ACTIVE'?'Ativa':c.effective_status==='PAUSED'?'Pausada':'Concluída'}</span></div>
       </div>
       <div class="camp-arrow">›</div>
     </div>
-  `).join('') || `<div style="padding:1rem 1.25rem;font-size:13px;color:#555">${isFiltered ? 'Nenhuma campanha encontrada para esse filtro' : 'Nenhuma campanha ativa'}</div>`;
+  `).join('') || `<div style="padding:1rem 1.25rem;font-size:13px;color:#555">${isFiltered?'Nenhuma campanha encontrada':'Nenhuma campanha ativa'}</div>`;
 
   document.getElementById('dash-content').innerHTML = `
     <div class="client-name">${currentClient.name}</div>
     <div class="hero">
       <div class="hero-label">Valor Gasto</div>
       <div class="hero-value"><span class="hero-currency">R$ </span>${spendVal.toLocaleString('pt-BR',{minimumFractionDigits:2})}</div>
-      <div class="delta">${isFiltered ? 'Período filtrado' : 'Últimos ' + (currentPeriod === '7d' ? '7' : currentPeriod === '30d' ? '30' : '90') + ' dias'}</div>
+      <div class="delta">${isFiltered?'Período filtrado':'Últimos '+(currentPeriod==='7d'?'7':currentPeriod==='30d'?'30':'90')+' dias'}</div>
     </div>
-    <div class="filter-bar">
-      <input class="filter-input" type="text" id="filter-name" placeholder="🔍 Buscar campanha..." oninput="applyFilter()"/>
-      <div class="filter-dates">
-        <input class="filter-input" type="date" id="filter-start" onchange="applyFilter()" title="Data início"/>
-        <input class="filter-input" type="date" id="filter-end" onchange="applyFilter()" title="Data fim"/>
-      </div>
-      <button class="filter-clear" id="filter-clear" onclick="clearFilter()">✕ Limpar filtro</button>
-    </div>
-    <div class="filter-summary" id="filter-summary"></div>
     <div class="section-title">Visão Geral</div>
     <div class="metrics-grid">
-      <div class="metric-card"><div class="mc-label">Alcance</div><div class="mc-value">${fmtNum(impressionsVal > 0 ? m.reach : 0)}</div><div class="mc-sub">pessoas únicas</div></div>
+      <div class="metric-card"><div class="mc-label">Alcance</div><div class="mc-value">${fmtNum(reachVal)}</div><div class="mc-sub">pessoas únicas</div></div>
       <div class="metric-card"><div class="mc-label">Impressões</div><div class="mc-value">${fmtNum(impressionsVal)}</div><div class="mc-sub">exibições</div></div>
-      <div class="metric-card"><div class="mc-label">Cliques</div><div class="mc-value">${fmtNum(clicksVal)}</div><div class="mc-sub up">CTR ${impressionsVal > 0 ? ((clicksVal/impressionsVal)*100).toFixed(2) : 0}%</div></div>
-      <div class="metric-card"><div class="mc-label">CPM</div><div class="mc-value">R$ ${parseFloat(m.cpm).toLocaleString('pt-BR',{minimumFractionDigits:2})}</div><div class="mc-sub">por mil impressões</div></div>
-      <div class="metric-card"><div class="mc-label">Conversas</div><div class="mc-value">${fmtNum(m.conversations)}</div><div class="mc-sub purple">WhatsApp iniciadas</div></div>
+      <div class="metric-card"><div class="mc-label">Cliques</div><div class="mc-value">${fmtNum(clicksVal)}</div><div class="mc-sub up">CTR ${impressionsVal>0?((clicksVal/impressionsVal)*100).toFixed(2):0}%</div></div>
+      <div class="metric-card"><div class="mc-label">CPM</div><div class="mc-value">R$ ${parseFloat(cpmVal).toLocaleString('pt-BR',{minimumFractionDigits:2})}</div><div class="mc-sub">por mil impressões</div></div>
+      <div class="metric-card"><div class="mc-label">Conversas</div><div class="mc-value">${fmtNum(conversationsVal)}</div><div class="mc-sub purple">WhatsApp iniciadas</div></div>
       <div class="metric-card"><div class="mc-label">CPC</div><div class="mc-value">R$ ${cpc}</div><div class="mc-sub">custo por clique</div></div>
     </div>
     <div class="section-title">Gasto Diário</div>
     <div class="chart-card">
-      <div class="chart-header"><div class="chart-title">Evolução de gastos</div><div class="chart-meta">R$ ${parseFloat(m.spend).toLocaleString('pt-BR',{minimumFractionDigits:2})} total</div></div>
+      <div class="chart-header"><div class="chart-title">Gasto por dia</div><div class="chart-meta">${isFiltered?'Período filtrado':'Últimos 14 dias'}</div></div>
       <div style="display:flex;gap:8px;align-items:flex-end">
         <div style="display:flex;flex-direction:column;justify-content:space-between;height:92px;padding-bottom:16px;flex-shrink:0">
           <span style="font-size:9px;font-family:'DM Mono',monospace;color:#555">R$${maxVal}</span>
@@ -248,38 +243,81 @@ async function renderDash(m, campaigns, daily, spendVal, impressionsVal, clicksV
         </div>
       </div>
     </div>
-    <div class="section-title">Campanhas Ativas</div>
+    <div class="section-title">Campanhas</div>
     <div class="camp-list">${campsHtml}</div>
   `;
+}
+
+function applyFilter() {
+  if (!rawMetrics) return;
+  const name = document.getElementById('filter-name').value.toLowerCase().trim();
+  const start = document.getElementById('filter-start').value;
+  const end = document.getElementById('filter-end').value;
+  const hasFilter = name || start || end;
+  document.getElementById('filter-clear').style.display = hasFilter ? 'block' : 'none';
+
+  if (start && end) {
+    const diff = (new Date(end) - new Date(start)) / (1000*60*60*24);
+    if (diff > 90) {
+      const s = document.getElementById('filter-summary');
+      s.style.display = 'block';
+      s.style.color = '#F87171';
+      s.textContent = '⚠️ Período máximo de 90 dias';
+      return;
+    }
+  }
+
+  let camps = rawMetrics.campaigns || [];
+  if (name) camps = camps.filter(c => c.name.toLowerCase().includes(name));
+
+  let daily = rawMetrics.daily || [];
+  if (start) daily = daily.filter(d => d.date >= start);
+  if (end) daily = daily.filter(d => d.date <= end);
+
+  const spendVal = daily.length && hasFilter ? daily.reduce((a,d)=>a+d.spend,0) : parseFloat(rawMetrics.spend);
+  const impressionsVal = daily.length && hasFilter ? daily.reduce((a,d)=>a+d.impressions,0) : rawMetrics.impressions;
+  const clicksVal = daily.length && hasFilter ? daily.reduce((a,d)=>a+d.clicks,0) : rawMetrics.clicks;
+
+  const summary = document.getElementById('filter-summary');
+  if (hasFilter) {
+    summary.style.display = 'block';
+    summary.style.color = '#7B61FF';
+    const parts = [];
+    if (name) parts.push(`"${name}": ${camps.length} campanha(s)`);
+    if (start || end) parts.push('período filtrado');
+    summary.textContent = '✓ ' + parts.join(' · ');
+  } else {
+    summary.style.display = 'none';
+  }
+
+  renderDash(camps, daily, spendVal, impressionsVal, clicksVal, rawMetrics.conversations, rawMetrics.reach, rawMetrics.ctr, rawMetrics.cpm, hasFilter);
+}
+
+function clearFilter() {
+  document.getElementById('filter-name').value = '';
+  document.getElementById('filter-start').value = '';
+  document.getElementById('filter-end').value = '';
+  document.getElementById('filter-clear').style.display = 'none';
+  document.getElementById('filter-summary').style.display = 'none';
+  if (rawMetrics) renderDash(rawMetrics.campaigns, rawMetrics.daily, parseFloat(rawMetrics.spend), rawMetrics.impressions, rawMetrics.clicks, rawMetrics.conversations, rawMetrics.reach, rawMetrics.ctr, rawMetrics.cpm, false);
 }
 
 async function openCampaign(campId, campName) {
   document.getElementById('modal-content').innerHTML = '<div class="modal-loading"><span class="spinner"></span>Carregando campanha...</div>';
   document.getElementById('modal-overlay').classList.add('open');
-  
   const res = await fetch(`${API}/campaign/${campId}?accountId=${currentAccountId}&period=${currentPeriod}`);
   const m = await res.json();
-  
-  if (m.error) {
-    document.getElementById('modal-content').innerHTML = '<div class="modal-loading">Erro ao carregar campanha.</div>';
-    return;
-  }
-
-  renderDash(m, m.campaigns, m.daily, parseFloat(m.spend), m.impressions, m.clicks, false);
-}
-
-async function renderDash(m, campaigns, daily, spendVal, impressionsVal, clicksVal, isFiltered) {
-  const cpc = clicksVal > 0 ? (spendVal/clicksVal).toFixed(2) : '0.00';
-
+  if (m.error) { document.getElementById('modal-content').innerHTML = '<div class="modal-loading">Erro ao carregar campanha.</div>'; return; }
+  const cpc = m.clicks > 0 ? (parseFloat(m.spend)/m.clicks).toFixed(2) : '0.00';
   document.getElementById('modal-content').innerHTML = `
     <div class="modal-title">${campName}</div>
-    <div class="modal-sub">Métricas dos últimos ${currentPeriod === '7d' ? '7' : currentPeriod === '30d' ? '30' : '90'} dias</div>
+    <div class="modal-sub">Métricas — ${currentPeriod==='7d'?'7':currentPeriod==='30d'?'30':'90'} dias</div>
     <div class="modal-grid">
       <div class="modal-card"><div class="mc-label">Gasto</div><div class="mc-value">R$ ${parseFloat(m.spend).toLocaleString('pt-BR',{minimumFractionDigits:2})}</div></div>
       <div class="modal-card"><div class="mc-label">Alcance</div><div class="mc-value">${fmtNum(m.reach)}</div></div>
-      <div class="modal-card"><div class="mc-label">Impressões</div><div class="mc-value">${fmtNum(impressionsVal)}</div></div>
+      <div class="modal-card"><div class="mc-label">Impressões</div><div class="mc-value">${fmtNum(m.impressions)}</div></div>
       <div class="modal-card"><div class="mc-label">Frequência</div><div class="mc-value">${m.frequency}×</div></div>
-      <div class="modal-card"><div class="mc-label">Cliques</div><div class="mc-value">${fmtNum(clicksVal)}</div><div class="mc-sub up">CTR ${impressionsVal > 0 ? ((clicksVal/impressionsVal)*100).toFixed(2) : 0}%</div></div>
+      <div class="modal-card"><div class="mc-label">Cliques</div><div class="mc-value">${fmtNum(m.clicks)}</div><div class="mc-sub up">CTR ${m.ctr}%</div></div>
       <div class="modal-card"><div class="mc-label">CPM</div><div class="mc-value">R$ ${parseFloat(m.cpm).toLocaleString('pt-BR',{minimumFractionDigits:2})}</div></div>
       <div class="modal-card"><div class="mc-label">Conversas</div><div class="mc-value">${fmtNum(m.conversations)}</div><div class="mc-sub purple">WhatsApp</div></div>
       <div class="modal-card"><div class="mc-label">CPC</div><div class="mc-value">R$ ${cpc}</div></div>
@@ -297,78 +335,15 @@ function showBarTip(el, val) {
   if (tip) { tip.textContent = val; setTimeout(()=>tip.textContent='', 2000); }
 }
 
-function applyFilter() {
-  if (!rawMetrics) return;
-  const name = document.getElementById('filter-name').value.toLowerCase().trim();
-  const start = document.getElementById('filter-start').value;
-  const end = document.getElementById('filter-end').value;
-  const clearBtn = document.getElementById('filter-clear');
-  const summary = document.getElementById('filter-summary');
-  const hasFilter = name || start || end;
-
-  clearBtn.style.display = hasFilter ? 'block' : 'none';
-
-  // Filtra campanhas por nome
-  let camps = rawMetrics.campaigns || [];
-  if (name) camps = camps.filter(c => c.name.toLowerCase().includes(name));
-
-  // Filtra gasto diário por data
-  let daily = rawMetrics.daily || [];
-  if (start) daily = daily.filter(d => d.date >= start);
-  if (end) daily = daily.filter(d => d.date <= end);
-
-  // Valida limite 90 dias
-  if (start && end) {
-    const diff = (new Date(end) - new Date(start)) / (1000*60*60*24);
-    if (diff > 90) {
-      document.getElementById('filter-end').classList.add('filter-active');
-      summary.style.display = 'block';
-      summary.textContent = '⚠️ Período máximo de 90 dias';
-      summary.style.color = '#F87171';
-      return;
-    }
-  }
-
-  // Recalcula métricas filtradas
-  const filteredSpend = daily.reduce((a, d) => a + d.spend, 0);
-  const filteredImpressions = daily.reduce((a, d) => a + d.impressions, 0);
-  const filteredClicks = daily.reduce((a, d) => a + d.clicks, 0);
-
-  if (hasFilter) {
-    summary.style.display = 'block';
-    summary.style.color = '#7B61FF';
-    const parts = [];
-    if (name) parts.push(`"${name}": ${camps.length} campanha(s)`);
-    if (start || end) parts.push(`período filtrado`);
-    summary.textContent = '✓ Filtro ativo — ' + parts.join(' · ');
-  } else {
-    summary.style.display = 'none';
-  }
-
-  renderDash(rawMetrics, camps, daily, filteredSpend, filteredImpressions, filteredClicks, hasFilter);
-}
-
-function clearFilter() {
-  document.getElementById('filter-name').value = '';
-  document.getElementById('filter-start').value = '';
-  document.getElementById('filter-end').value = '';
-  document.getElementById('filter-clear').style.display = 'none';
-  document.getElementById('filter-summary').style.display = 'none';
-  if (rawMetrics) renderDash(rawMetrics, rawMetrics.campaigns, rawMetrics.daily, parseFloat(rawMetrics.spend), rawMetrics.impressions, rawMetrics.clicks, false);
-}
-
 function fmtNum(n) {
+  if (!n) return '0';
   if (n >= 1000000) return (n/1000000).toFixed(1)+'M';
   if (n >= 1000) return (n/1000).toFixed(1)+'K';
-  return (n||0).toString();
+  return n.toString();
 }
 
 function fmtObjective(o) {
-  const map = {
-    'MESSAGES':'Mensagens','CONVERSIONS':'Conversões','REACH':'Alcance',
-    'TRAFFIC':'Tráfego','ENGAGEMENT':'Engajamento','LEAD_GENERATION':'Leads',
-    'BRAND_AWARENESS':'Reconhecimento','VIDEO_VIEWS':'Visualizações de vídeo'
-  };
+  const map = {'MESSAGES':'Mensagens','CONVERSIONS':'Conversões','REACH':'Alcance','TRAFFIC':'Tráfego','ENGAGEMENT':'Engajamento','OUTCOME_ENGAGEMENT':'Mensagens','OUTCOME_TRAFFIC':'Tráfego','OUTCOME_LEADS':'Leads','OUTCOME_AWARENESS':'Reconhecimento','OUTCOME_SALES':'Vendas','LEAD_GENERATION':'Leads','BRAND_AWARENESS':'Reconhecimento','VIDEO_VIEWS':'Visualizações'};
   return map[o] || o || 'Campanha';
 }
 
@@ -386,24 +361,25 @@ function toggleMenu() {
 document.addEventListener('click', function(e) {
   const menu = document.getElementById('avatar-menu');
   const avatar = document.getElementById('avatar');
-  if (menu && !menu.contains(e.target) && !avatar.contains(e.target)) {
+  if (menu && !menu.contains(e.target) && avatar && !avatar.contains(e.target)) {
     menu.classList.remove('open');
   }
 });
 
 function doLogout() {
   currentClient = null;
+  rawMetrics = null;
   sessionStorage.removeItem('metadash_email');
   document.getElementById('screen-dash').classList.remove('active');
   document.getElementById('screen-login').classList.add('active');
   document.getElementById('login-email').value = '';
+  document.getElementById('avatar-menu').classList.remove('open');
 }
 
 document.getElementById('login-email').addEventListener('keypress', e => {
   if (e.key === 'Enter') doLogin();
 });
 
-// Auto-login se tiver email salvo
 window.addEventListener('load', async () => {
   const saved = sessionStorage.getItem('metadash_email');
   if (saved) {
