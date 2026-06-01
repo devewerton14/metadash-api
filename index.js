@@ -94,7 +94,7 @@ app.get('/metrics/:accountId', async (req, res) => {
         limit: 20,
       }}
     );
-    const campaigns = (campRes.data.data || []).filter(c => c.status === 'ACTIVE' || c.effective_status === 'ACTIVE' || c.effective_status === 'PAUSED');
+    const campaigns = campRes.data.data || [];
 
     res.json({
       spend: parseFloat(raw.spend || 0).toFixed(2),
