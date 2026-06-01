@@ -86,7 +86,7 @@ app.get('/metrics/:accountId', async (req, res) => {
       `https://graph.facebook.com/v19.0/${account.account_id}/campaigns`,
       { params: {
         access_token: account.access_token,
-        fields: 'id,name,status,objective',
+        fields: 'id,name,status,effective_status,objective',
 
 
         effective_status: ['ACTIVE','PAUSED'],
