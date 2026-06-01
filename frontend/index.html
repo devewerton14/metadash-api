@@ -34,11 +34,11 @@
 html,body{overflow-x:hidden;overscroll-behavior:none;touch-action:pan-y;max-width:100vw}
 body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
 .screen{display:none}.screen.active{display:block}
-.login-wrap{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:2rem 1.5rem;max-width:420px;margin:0 auto}
+.login-wrap{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:2rem 1.5rem;max-width:420px;margin:0 auto;background:#0A0A0F}
 .logo{font-size:28px;font-weight:600;letter-spacing:-0.5px;margin-bottom:8px}.logo span{color:var(--purple)}
 .tagline{font-size:14px;color:var(--text2);margin-bottom:3rem;font-weight:300}
 .label{font-size:11px;text-transform:uppercase;letter-spacing:1.2px;color:#666;margin-bottom:6px;font-weight:500}
-.input{width:100%;background:var(--bg2);border:1px solid var(--border2);border-radius:10px;padding:14px 16px;font-size:15px;font-family:'DM Sans',sans-serif;color:var(--text);margin-bottom:1rem;outline:none;transition:border-color 0.2s}
+.input{width:100%;background:#14141C;border:1px solid #222230;border-radius:10px;padding:14px 16px;font-size:15px;font-family:'DM Sans',sans-serif;color:#F0EEF8;margin-bottom:1rem;outline:none;transition:border-color 0.2s}
 .input:focus{border-color:var(--purple)}
 .btn{width:100%;background:var(--purple);border:none;border-radius:10px;padding:16px;font-size:15px;font-family:'DM Sans',sans-serif;font-weight:500;color:#fff;cursor:pointer;margin-top:0.5rem;transition:opacity 0.2s,transform 0.1s}
 .btn:active{transform:scale(0.98);opacity:0.9}
@@ -76,6 +76,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .mc-value{font-size:20px;font-weight:600;letter-spacing:-0.5px;margin-bottom:4px}
 .mc-sub{font-size:11px;font-family:'DM Mono',monospace;color:#666}
 .mc-sub.up{color:var(--green)}.mc-sub.down{color:var(--red)}.mc-sub.purple{color:var(--purple)}
+.account-alert{margin:0 1.25rem 1rem;background:var(--red-bg);border:1px solid var(--red);border-radius:12px;padding:1rem;display:flex;align-items:flex-start;gap:10px}
+.account-alert-icon{font-size:18px;flex-shrink:0}
+.account-alert-text{font-size:13px;color:var(--red);line-height:1.4}
+.account-alert-title{font-weight:600;margin-bottom:2px}
 .loading{text-align:center;padding:3rem;color:var(--text3);font-size:14px}
 .spinner{display:inline-block;width:20px;height:20px;border:2px solid #333;border-top-color:var(--purple);border-radius:50%;animation:spin 0.8s linear infinite;margin-right:8px;vertical-align:middle}
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -89,6 +93,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .bar{width:100%;border-radius:3px 3px 0 0;background:var(--purple)33;min-height:2px}
 .bar.today{background:var(--purple)}
 .bar-label{font-size:8px;color:var(--text4);font-family:'DM Mono',monospace}
+.filter-active-btn{display:flex;align-items:center;gap:8px;margin:0 1.25rem 0.75rem;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:10px 14px;cursor:pointer;font-size:13px;font-family:'DM Sans',sans-serif;color:var(--text3);transition:all 0.15s;width:calc(100% - 2.5rem)}
+.filter-active-btn.on{background:var(--green-bg);border-color:var(--green);color:var(--green)}
+.filter-active-dot{width:8px;height:8px;border-radius:50%;background:currentColor;flex-shrink:0}
 .camp-list{padding:0 1.25rem;margin-bottom:1rem;display:flex;flex-direction:column;gap:8px}
 .camp-item{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:1rem;display:flex;align-items:center;gap:12px;cursor:pointer;transition:border-color 0.15s}
 .camp-item:active{border-color:var(--purple)55}
@@ -113,7 +120,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 </head>
 <body>
 
-<div class="screen active" id="screen-login">
+<div class="screen active" id="screen-login" style="background:#0A0A0F;min-height:100vh">
   <div class="login-wrap">
     <img src="https://gptriade.com.br/wp-content/uploads/2023/01/Logo-Triade-1-300x100.png" style="height:36px;width:auto;margin-bottom:1.5rem;display:block;align-self:flex-start;" alt="Agência Tríade"/>
     <div class="logo">meta<span>dash</span></div>
@@ -174,6 +181,8 @@ let currentClient = null;
 let currentPeriod = '30d';
 let currentAccountId = null;
 let rawMetrics = null;
+let onlyActive = true;
+let accountStatus = 1;
 
 async function doLogin() {
   const email = document.getElementById('login-email').value.trim();
@@ -203,10 +212,17 @@ async function loadDash() {
   const m = await metRes.json();
   if (m.error) { document.getElementById('dash-content').innerHTML = '<div class="loading">Erro ao carregar métricas.</div>'; return; }
   rawMetrics = m;
-  renderDash(m.campaigns, m.daily, parseFloat(m.spend), m.impressions, m.clicks, m.conversations, m.reach, m.ctr, m.cpm, false);
+  accountStatus = m.accountStatus || 1;
+  let initialCamps = m.campaigns || [];
+  if (onlyActive) initialCamps = initialCamps.filter(c => {
+    const isActive = c.effective_status === 'ACTIVE';
+    const concluded = isActive && c.stop_time && new Date(c.stop_time) < new Date();
+    return isActive && !concluded;
+  });
+  renderDash(initialCamps, m.daily, parseFloat(m.spend), m.impressions, m.clicks, m.conversations, m.reach, m.ctr, m.cpm, false, m.accountStatus||1);
 }
 
-function renderDash(campaigns, daily, spendVal, impressionsVal, clicksVal, conversationsVal, reachVal, ctrVal, cpmVal, isFiltered) {
+function renderDash(campaigns, daily, spendVal, impressionsVal, clicksVal, conversationsVal, reachVal, ctrVal, cpmVal, isFiltered, accountStatus=1) {
   const cpc = clicksVal > 0 ? (spendVal/clicksVal).toFixed(2) : '0.00';
   const maxSpend = Math.max(...(daily||[]).map(d=>d.spend), 1);
   const minSpend = Math.min(...(daily||[]).map(d=>d.spend));
@@ -236,6 +252,14 @@ function renderDash(campaigns, daily, spendVal, impressionsVal, clicksVal, conve
 
   document.getElementById('dash-content').innerHTML = `
     <div class="client-name">${currentClient.name}</div>
+    ${accountStatus !== 1 ? `
+    <div class="account-alert">
+      <span class="account-alert-icon">⚠️</span>
+      <div class="account-alert-text">
+        <div class="account-alert-title">Conta com restrição</div>
+        ${accountStatus === 2 ? 'Conta desativada.' : accountStatus === 3 ? 'Conta não autorizada.' : accountStatus === 7 ? 'Conta desativada por política.' : accountStatus === 9 ? 'Conta com pagamento pendente — regularize para retomar os anúncios.' : accountStatus === 101 ? 'Conta pausada.' : 'Verifique sua conta no Gerenciador de Anúncios.'}
+      </div>
+    </div>` : ''}
     <div class="hero">
       <div class="hero-label">Valor Gasto</div>
       <div class="hero-value"><span class="hero-currency">R$ </span>${spendVal.toLocaleString('pt-BR',{minimumFractionDigits:2})}</div>
@@ -265,6 +289,10 @@ function renderDash(campaigns, daily, spendVal, impressionsVal, clicksVal, conve
       </div>
     </div>
     <div class="section-title">Campanhas</div>
+    <button class="filter-active-btn on" id="btn-only-active" onclick="toggleOnlyActive()">
+      <span class="filter-active-dot"></span>
+      <span id="btn-only-active-text">Apenas ativas</span>
+    </button>
     <div class="camp-list">${campsHtml}</div>
   `;
 }
@@ -289,6 +317,11 @@ function applyFilter() {
   }
 
   let camps = rawMetrics.campaigns || [];
+  if (onlyActive) camps = camps.filter(c => {
+    const isActive = c.effective_status === 'ACTIVE';
+    const concluded = isActive && c.stop_time && new Date(c.stop_time) < new Date();
+    return isActive && !concluded;
+  });
   if (name) camps = camps.filter(c => c.name.toLowerCase().includes(name));
 
   let daily = rawMetrics.daily || [];
@@ -311,7 +344,7 @@ function applyFilter() {
     summary.style.display = 'none';
   }
 
-  renderDash(camps, daily, spendVal, impressionsVal, clicksVal, rawMetrics.conversations, rawMetrics.reach, rawMetrics.ctr, rawMetrics.cpm, hasFilter);
+  renderDash(camps, daily, spendVal, impressionsVal, clicksVal, rawMetrics.conversations, rawMetrics.reach, rawMetrics.ctr, rawMetrics.cpm, hasFilter, rawMetrics.accountStatus||1);
 }
 
 function clearFilter() {
@@ -320,7 +353,15 @@ function clearFilter() {
   document.getElementById('filter-end').value = '';
   document.getElementById('filter-clear').style.display = 'none';
   document.getElementById('filter-summary').style.display = 'none';
-  if (rawMetrics) renderDash(rawMetrics.campaigns, rawMetrics.daily, parseFloat(rawMetrics.spend), rawMetrics.impressions, rawMetrics.clicks, rawMetrics.conversations, rawMetrics.reach, rawMetrics.ctr, rawMetrics.cpm, false);
+  if (rawMetrics) {
+    let camps = rawMetrics.campaigns || [];
+    if (onlyActive) camps = camps.filter(c => {
+      const isActive = c.effective_status === 'ACTIVE';
+      const concluded = isActive && c.stop_time && new Date(c.stop_time) < new Date();
+      return isActive && !concluded;
+    });
+    renderDash(camps, rawMetrics.daily, parseFloat(rawMetrics.spend), rawMetrics.impressions, rawMetrics.clicks, rawMetrics.conversations, rawMetrics.reach, rawMetrics.ctr, rawMetrics.cpm, false, rawMetrics.accountStatus||1);
+  }
 }
 
 async function openCampaign(campId, campName) {
@@ -373,6 +414,20 @@ function setPeriod(p, el) {
   document.querySelectorAll('.ptab').forEach(t => t.classList.remove('active'));
   el.classList.add('active');
   loadDash();
+}
+
+function toggleOnlyActive() {
+  onlyActive = !onlyActive;
+  const btn = document.getElementById('btn-only-active');
+  const txt = document.getElementById('btn-only-active-text');
+  if (onlyActive) {
+    btn.classList.add('on');
+    txt.textContent = 'Apenas ativas';
+  } else {
+    btn.classList.remove('on');
+    txt.textContent = 'Todas as campanhas';
+  }
+  applyFilter();
 }
 
 function toggleTheme() {

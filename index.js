@@ -96,7 +96,18 @@ app.get('/metrics/:accountId', async (req, res) => {
     );
     const campaigns = campRes.data.data || [];
 
+    // Busca status da conta
+    const statusRes = await axios.get(
+      `https://graph.facebook.com/v19.0/${account.account_id}`,
+      { params: { access_token: account.access_token, fields: 'account_status,disable_reason' }}
+    ).catch(() => ({ data: { account_status: 1 } }));
+
+    const accountStatus = statusRes.data.account_status;
+    const disableReason = statusRes.data.disable_reason || 0;
+
     res.json({
+      accountStatus,
+      disableReason,
       spend: parseFloat(raw.spend || 0).toFixed(2),
       impressions: parseInt(raw.impressions || 0),
       clicks: parseInt(raw.clicks || 0),
