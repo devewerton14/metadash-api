@@ -161,10 +161,10 @@ async function loadDash() {
 
   const campsHtml = (m.campaigns||[]).map(c => `
     <div class="camp-item" onclick="openCampaign('${c.id}','${c.name.replace(/'/g,"\\'")}')">
-      <div class="camp-dot"></div><div class="camp-dot" style="background:${c.status==='ACTIVE'?'#34D399':c.status==='PAUSED'?'#FACC15':'#555'}"></div>
+      <div class="camp-dot" style="background:${c.status==='ACTIVE'?'#34D399':c.status==='PAUSED'?'#FACC15':'#555'}"></div><div class="camp-dot" style="background:${c.status==='ACTIVE'?'#34D399':c.status==='PAUSED'?'#FACC15':'#555'}"></div>
       <div class="camp-info">
         <div class="camp-name">${c.name}</div>
-        <div class="camp-type">${fmtObjective(c.objective)}</div><div class="camp-type">${fmtObjective(c.objective)} · <span style="color:${c.status==='ACTIVE'?'#34D399':c.status==='PAUSED'?'#FACC15':'#555'};font-size:10px">${c.status==='ACTIVE'?'Ativa':c.status==='PAUSED'?'Pausada':'Concluída'}</span></div>
+        <div class="camp-type">${fmtObjective(c.objective)} · <span style="color:${c.status==='ACTIVE'?'#34D399':c.status==='PAUSED'?'#FACC15':'#555'};font-size:10px">${c.status==='ACTIVE'?'Ativa':c.status==='PAUSED'?'Pausada':'Concluída'}</span></div><div class="camp-type">${fmtObjective(c.objective)} · <span style="color:${c.status==='ACTIVE'?'#34D399':c.status==='PAUSED'?'#FACC15':'#555'};font-size:10px">${c.status==='ACTIVE'?'Ativa':c.status==='PAUSED'?'Pausada':'Concluída'}</span></div>
       </div>
       <div class="camp-arrow">›</div>
     </div>
