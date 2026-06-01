@@ -309,7 +309,7 @@ function renderDash(campaigns, daily, spendVal, impressionsVal, clicksVal, conve
   const daily14 = (daily||[]);
 
   const barsHtml = daily14.map((d,i,arr) => {
-    const h = Math.max(Math.round((d.spend/maxSpend)*76), 2);
+    const h = Math.max(Math.round((d.spend/maxSpend)*72), 6);
     const isLast = i === arr.length-1;
     const day = new Date(d.date).getDate();
     const val = d.spend.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
