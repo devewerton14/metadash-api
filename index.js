@@ -164,5 +164,36 @@ app.get('/campaign/:campaignId', async (req, res) => {
   }
 });
 
+// Renova tokens automaticamente
+async function renewTokens() {
+  try {
+    const { data: accounts } = await supabase.from('ad_accounts').select('*');
+    for (const acc of accounts) {
+      try {
+        const res = await axios.get('https://graph.facebook.com/v19.0/oauth/access_token', {
+          params: {
+            grant_type: 'fb_exchange_token',
+            client_id: '1359788582689921',
+            client_secret: 'bc3047a58d493fe264de69c129e8eedf',
+            fb_exchange_token: acc.access_token,
+          }
+        });
+        const newToken = res.data.access_token;
+        await supabase.from('ad_accounts').update({ access_token: newToken }).eq('id', acc.id);
+        console.log(`Token renovado para: ${acc.account_name}`);
+      } catch (err) {
+        console.error(`Erro ao renovar token de ${acc.account_name}:`, err?.response?.data || err.message);
+      }
+    }
+  } catch (err) {
+    console.error('Erro ao buscar contas para renovar tokens:', err.message);
+  }
+}
+
+// Roda na inicialização e todo dia às 3h da manhã
+renewTokens();
+const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000;
+setInterval(renewTokens, TWENTY_FOUR_HOURS);
+
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => console.log(`API rodando na porta ${PORT}`));
