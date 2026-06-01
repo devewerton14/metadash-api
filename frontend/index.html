@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>MetaDash</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:#0A0A0F;color:#F0EEF8;min-height:100vh}
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
+
+.screen{display:none}
+.screen.active{display:block}
+
+/* LOGIN */
+.login-wrap{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:2rem 1.5rem;max-width:420px;margin:0 auto}
+.logo{font-size:28px;font-weight:600;letter-spacing:-0.5px;margin-bottom:8px}
+.logo span{color:#7B61FF}
+.tagline{font-size:14px;color:#888;margin-bottom:3rem;font-weight:300}
+.label{font-size:11px;text-transform:uppercase;letter-spacing:1.2px;color:#666;margin-bottom:6px;font-weight:500}
+.input{width:100%;background:#14141C;border:1px solid #222230;border-radius:10px;padding:14px 16px;font-size:15px;font-family:'DM Sans',sans-serif;color:#F0EEF8;margin-bottom:1rem;outline:none;transition:border-color 0.2s}
+.input:focus{border-color:#7B61FF}
+.btn{width:100%;background:#7B61FF;border:none;border-radius:10px;padding:16px;font-size:15px;font-family:'DM Sans',sans-serif;font-weight:500;color:#fff;cursor:pointer;margin-top:0.5rem;transition:opacity 0.2s,transform 0.1s}
+.btn:active{transform:scale(0.98);opacity:0.9}
+.hint{font-size:12px;color:#555;text-align:center;margin-top:1.5rem}
+.error-msg{background:#3D1515;color:#F87171;padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:1rem;display:none}
+
+/* HEADER */
+.header{padding:1rem 1.25rem 0.75rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:#0A0A0FEE;backdrop-filter:blur(12px);z-index:10;border-bottom:1px solid #14141C}
+.header-logo{font-size:18px;font-weight:600;letter-spacing:-0.3px}
+.header-logo span{color:#7B61FF}
+.avatar{width:32px;height:32px;border-radius:50%;background:#7B61FF22;border:1.5px solid #7B61FF44;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#7B61FF;cursor:pointer}
+
+/* DASHBOARD */
+.dash{max-width:420px;margin:0 auto;padding-bottom:2rem}
+.period-tabs{padding:0.75rem 1.25rem;display:flex;gap:4px}
+.ptab{flex:1;text-align:center;padding:6px 0;font-size:12px;font-weight:500;border-radius:8px;cursor:pointer;color:#555;transition:all 0.15s;border:none;background:none}
+.ptab.active{background:#14141C;color:#F0EEF8}
+.hero{margin:0.5rem 1.25rem 1rem;background:#14141C;border-radius:16px;padding:1.25rem;border:1px solid #1E1E2E;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-40px;right:-40px;width:120px;height:120px;background:#7B61FF15;border-radius:50%}
+.hero-label{font-size:11px;text-transform:uppercase;letter-spacing:1.2px;color:#555;margin-bottom:4px}
+.hero-value{font-size:32px;font-weight:600;letter-spacing:-1px;margin-bottom:2px}
+.hero-currency{font-size:18px;font-weight:400;color:#888}
+.delta{font-size:12px;font-family:'DM Mono',monospace;display:inline-flex;align-items:center;gap:3px;padding:3px 8px;border-radius:20px;background:#0F3D2A;color:#34D399;margin-top:4px}
+.section-title{padding:0.5rem 1.25rem;font-size:11px;text-transform:uppercase;letter-spacing:1.2px;color:#555;font-weight:500}
+.metrics-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 1.25rem;margin-bottom:1rem}
+.metric-card{background:#14141C;border:1px solid #1E1E2E;border-radius:12px;padding:1rem}
+.mc-label{font-size:11px;color:#555;margin-bottom:6px}
+.mc-value{font-size:20px;font-weight:600;letter-spacing:-0.5px;margin-bottom:4px}
+.mc-sub{font-size:11px;font-family:'DM Mono',monospace;color:#666}
+.mc-sub.up{color:#34D399}
+.mc-sub.down{color:#F87171}
+.loading{text-align:center;padding:3rem;color:#555;font-size:14px}
+.spinner{display:inline-block;width:20px;height:20px;border:2px solid #333;border-top-color:#7B61FF;border-radius:50%;animation:spin 0.8s linear infinite;margin-right:8px;vertical-align:middle}
+@keyframes spin{to{transform:rotate(360deg)}}
+.client-name{padding:0 1.25rem 0.5rem;font-size:22px;font-weight:600;letter-spacing:-0.5px}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="screen active" id="screen-login">
+  <div class="login-wrap">
+    <div class="logo">meta<span>dash</span></div>
+    <div class="tagline">Resultados dos seus anúncios, em tempo real.</div>
+    <div class="error-msg" id="error-msg">E-mail não encontrado.</div>
+    <div class="label">E-mail</div>
+    <input class="input" type="email" id="login-email" placeholder="seu@email.com"/>
+    <button class="btn" onclick="doLogin()">Entrar</button>
+    <div class="hint">Digite o e-mail cadastrado para acessar</div>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div class="screen" id="screen-dash">
+  <div class="header">
+    <div class="header-logo">meta<span>dash</span></div>
+    <div class="avatar" id="avatar" onclick="doLogout()">--</div>
+  </div>
+  <div class="dash">
+    <div class="period-tabs">
+      <button class="ptab" onclick="setPeriod('7d',this)">7 dias</button>
+      <button class="ptab active" onclick="setPeriod('30d',this)">30 dias</button>
+      <button class="ptab" onclick="setPeriod('90d',this)">90 dias</button>
+    </div>
+    <div id="dash-content"><div class="loading"><span class="spinner"></span>Carregando métricas...</div></div>
+  </div>
+</div>
+
+<script>
+const API = 'https://metadash-api.cjwrxp.easypanel.host';
+let currentClient = null;
+let currentPeriod = '30d';
+
+async function doLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  if (!email) return;
+  
+  const res = await fetch(`${API}/clients`);
+  const clients = await res.json();
+  const client = clients.find(c => c.email === email);
+  
+  if (!client) {
+    document.getElementById('error-msg').style.display = 'block';
+    return;
+  }
+  
+  document.getElementById('error-msg').style.display = 'none';
+  currentClient = client;
+  document.getElementById('avatar').textContent = client.name.slice(0,2).toUpperCase();
+  document.getElementById('screen-login').classList.remove('active');
+  document.getElementById('screen-dash').classList.add('active');
+  loadDash();
+}
+
+async function loadDash() {
+  document.getElementById('dash-content').innerHTML = '<div class="loading"><span class="spinner"></span>Carregando métricas...</div>';
+  
+  const accRes = await fetch(`${API}/accounts/${currentClient.id}`);
+  const accounts = await accRes.json();
+  
+  if (!accounts.length) {
+    document.getElementById('dash-content').innerHTML = '<div class="loading">Nenhuma conta encontrada.</div>';
+    return;
+  }
+  
+  const acc = accounts[0];
+  const metRes = await fetch(`${API}/metrics/${acc.id}?period=${currentPeriod}`);
+  const m = await metRes.json();
+  
+  const roas = m.spend > 0 ? ((m.conversions * 100) / m.spend).toFixed(1) : '—';
+  
+  document.getElementById('dash-content').innerHTML = `
+    <div class="client-name">${currentClient.name}</div>
+    <div class="hero">
+      <div class="hero-label">Valor Gasto</div>
+      <div class="hero-value"><span class="hero-currency">R$ </span>${parseFloat(m.spend).toLocaleString('pt-BR',{minimumFractionDigits:2})}</div>
+      <div class="delta">▲ Últimos ${currentPeriod === '7d' ? '7' : currentPeriod === '30d' ? '30' : '90'} dias</div>
+    </div>
+    <div class="section-title">Visão Geral</div>
+    <div class="metrics-grid">
+      <div class="metric-card"><div class="mc-label">Alcance</div><div class="mc-value">${fmtNum(m.reach)}</div><div class="mc-sub">pessoas únicas</div></div>
+      <div class="metric-card"><div class="mc-label">Impressões</div><div class="mc-value">${fmtNum(m.impressions)}</div><div class="mc-sub">exibições</div></div>
+      <div class="metric-card"><div class="mc-label">Cliques</div><div class="mc-value">${fmtNum(m.clicks)}</div><div class="mc-sub up">CTR ${m.ctr}%</div></div>
+      <div class="metric-card"><div class="mc-label">CPM</div><div class="mc-value">R$ ${parseFloat(m.cpm).toLocaleString('pt-BR',{minimumFractionDigits:2})}</div><div class="mc-sub">por mil impressões</div></div>
+      <div class="metric-card"><div class="mc-label">Conversões</div><div class="mc-value">${m.conversions}</div><div class="mc-sub ${m.conversions > 0 ? 'up' : ''}">resultados</div></div>
+      <div class="metric-card"><div class="mc-label">CPM Médio</div><div class="mc-value">R$ ${(m.spend/Math.max(m.clicks,1)).toFixed(2)}</div><div class="mc-sub">custo por clique</div></div>
+    </div>
+  `;
+}
+
+function fmtNum(n) {
+  if (n >= 1000000) return (n/1000000).toFixed(1)+'M';
+  if (n >= 1000) return (n/1000).toFixed(1)+'K';
+  return n.toString();
+}
+
+function setPeriod(p, el) {
+  currentPeriod = p;
+  document.querySelectorAll('.ptab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  loadDash();
+}
+
+function doLogout() {
+  currentClient = null;
+  document.getElementById('screen-dash').classList.remove('active');
+  document.getElementById('screen-login').classList.add('active');
+  document.getElementById('login-email').value = '';
+}
+
+document.getElementById('login-email').addEventListener('keypress', e => {
+  if (e.key === 'Enter') doLogin();
+});
+</script>
+</body>
+</html>
