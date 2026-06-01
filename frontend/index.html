@@ -102,7 +102,7 @@ body{font-family:'DM Sans',sans-serif;background:#0A0A0F;color:#F0EEF8;min-heigh
 
 <div class="screen" id="screen-dash">
   <div class="header">
-    <div style="display:flex;align-items:center;gap:10px"><img src="https://gptriade.com.br/wp-content/uploads/2023/01/Logo-Triade-1-300x100.png" style="height:28px;width:auto;" alt="Agência Tríade"/><div class="header-logo">meta<span>dash</span></div></div></div>
+    <div style="display:flex;align-items:center;gap:10px"><img src="https://gptriade.com.br/wp-content/uploads/2023/01/Logo-Triade-1-300x100.png" style="height:24px;width:auto;" alt="Agência Tríade"/></div><div class="header-logo">meta<span>dash</span></div></div>
     <div class="avatar" id="avatar" onclick="doLogout()">--</div>
   </div>
   <div class="dash">
@@ -142,6 +142,7 @@ async function doLogin() {
   document.getElementById('avatar').textContent = client.name.slice(0,2).toUpperCase();
   document.getElementById('screen-login').classList.remove('active');
   document.getElementById('screen-dash').classList.add('active');
+  sessionStorage.setItem('metadash_email', email);
   loadDash();
 }
 
@@ -280,6 +281,7 @@ function setPeriod(p, el) {
 
 function doLogout() {
   currentClient = null;
+  sessionStorage.removeItem('metadash_email');
   document.getElementById('screen-dash').classList.remove('active');
   document.getElementById('screen-login').classList.add('active');
   document.getElementById('login-email').value = '';
@@ -287,6 +289,15 @@ function doLogout() {
 
 document.getElementById('login-email').addEventListener('keypress', e => {
   if (e.key === 'Enter') doLogin();
+});
+
+// Auto-login se tiver email salvo
+window.addEventListener('load', async () => {
+  const saved = sessionStorage.getItem('metadash_email');
+  if (saved) {
+    document.getElementById('login-email').value = saved;
+    await doLogin();
+  }
 });
 </script>
 </body>
