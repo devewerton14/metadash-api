@@ -90,8 +90,8 @@ app.get('/metrics/:accountId', async (req, res) => {
 
 
         effective_status: ['ACTIVE','PAUSED','ARCHIVED','WITH_ISSUES','CAMPAIGN_PAUSED'],
-        limit: 20,
-        limit: 20,
+        limit: account.account_id === 'act_725071917282682' ? 200 : 20,
+        limit: account.account_id === 'act_725071917282682' ? 200 : 20,
       }}
     );
     const campaigns = campRes.data.data || [];
