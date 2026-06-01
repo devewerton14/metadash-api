@@ -87,11 +87,14 @@ app.get('/metrics/:accountId', async (req, res) => {
       { params: {
         access_token: account.access_token,
         fields: 'id,name,status,objective',
-        effective_status: ['ACTIVE'],
+
+
+        effective_status: ["ACTIVE"],
+        limit: 20,
         limit: 20,
       }}
     );
-    const campaigns = campRes.data.data || [];
+    const campaigns = campRes.data.data || [];const campaigns = (campRes.data.data || []).filter(c => c.status === 'ACTIVE' || c.effective_status === 'ACTIVE');
 
     res.json({
       spend: parseFloat(raw.spend || 0).toFixed(2),
