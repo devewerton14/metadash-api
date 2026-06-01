@@ -89,7 +89,7 @@ app.get('/metrics/:accountId', async (req, res) => {
         fields: 'id,name,status,effective_status,objective',
 
 
-        effective_status: ['ACTIVE','PAUSED'],
+        effective_status: ['ACTIVE','PAUSED','ARCHIVED','WITH_ISSUES','CAMPAIGN_PAUSED'],
         limit: 20,
         limit: 20,
       }}
