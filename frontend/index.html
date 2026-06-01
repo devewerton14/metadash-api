@@ -44,15 +44,15 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .btn:active{transform:scale(0.98);opacity:0.9}
 .hint{font-size:12px;color:var(--text3);text-align:center;margin-top:1.5rem}
 .error-msg{background:var(--red-bg);color:var(--red);padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:1rem;display:none}
-.header{padding:0.75rem 1.25rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--bg)EE;backdrop-filter:blur(12px);z-index:10;border-bottom:1px solid var(--border)}
-.header-logo{font-size:16px;font-weight:600;letter-spacing:-0.3px}.header-logo span{color:var(--purple)}
+.header{padding:0.75rem 1.25rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:#0A0A0FEE;backdrop-filter:blur(12px);z-index:10;border-bottom:1px solid #14141C}
+.header-logo{font-size:16px;font-weight:600;letter-spacing:-0.3px;color:#F0EEF8}.header-logo span{color:#7B61FF}
 .avatar{width:32px;height:32px;border-radius:50%;background:var(--purple)22;border:1.5px solid var(--purple-border);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:var(--purple);cursor:pointer}
 .avatar-wrap{position:relative}
-.avatar-menu{position:absolute;top:40px;right:0;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:0.5rem;min-width:160px;z-index:100;display:none;box-shadow:0 8px 24px var(--shadow)}
+.avatar-menu{position:absolute;top:40px;right:0;background:#14141C;border:1px solid #1E1E2E;border-radius:12px;padding:0.5rem;min-width:160px;z-index:100;display:none;box-shadow:0 8px 24px #00000066}
 .avatar-menu.open{display:block}
 .avatar-menu-name{font-size:13px;padding:8px 12px;color:var(--text2);border-bottom:1px solid var(--border);margin-bottom:4px}
-.avatar-menu-item{display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:8px;font-size:13px;cursor:pointer;color:var(--red);transition:background 0.15s}
-.avatar-menu-item:hover{background:var(--bg3)}
+.avatar-menu-item{display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:8px;font-size:13px;cursor:pointer;color:#F87171;transition:background 0.15s}
+.avatar-menu-item:hover{background:#1E1E2E}
 .dash{max-width:420px;margin:0 auto;padding-bottom:2rem}
 .period-tabs{padding:0.75rem 1.25rem;display:flex;gap:4px}
 .ptab{flex:1;text-align:center;padding:6px 0;font-size:12px;font-weight:500;border-radius:8px;cursor:pointer;color:var(--text3);transition:all 0.15s;border:none;background:none}
@@ -130,7 +130,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
   <div class="header">
     <img src="https://gptriade.com.br/wp-content/uploads/2023/01/Logo-Triade-1-300x100.png" style="height:24px;width:auto;" alt="Agência Tríade"/>
     <div style="display:flex;align-items:center;gap:12px">
-      <button onclick="toggleTheme()" id="theme-btn" style="background:none;border:1px solid var(--border2);border-radius:8px;padding:5px 8px;cursor:pointer;font-size:14px;color:var(--text3)">🌙</button>
+      <button onclick="toggleTheme()" id="theme-btn" style="background:none;border:1px solid #222230;border-radius:8px;padding:5px 8px;cursor:pointer;font-size:14px;color:#888">🌙</button>
       <div class="header-logo">meta<span>dash</span></div>
       <div class="avatar-wrap">
         <div class="avatar" id="avatar" onclick="toggleMenu()">--</div>
