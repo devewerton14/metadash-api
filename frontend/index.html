@@ -27,6 +27,12 @@ body{font-family:'DM Sans',sans-serif;background:#0A0A0F;color:#F0EEF8;min-heigh
 .header{padding:1rem 1.25rem 0.75rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:#0A0A0FEE;backdrop-filter:blur(12px);z-index:10;border-bottom:1px solid #14141C}
 .header-logo{font-size:18px;font-weight:600;letter-spacing:-0.3px}.header-logo span{color:#7B61FF}
 .avatar{width:32px;height:32px;border-radius:50%;background:#7B61FF22;border:1.5px solid #7B61FF44;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#7B61FF;cursor:pointer}
+.avatar-menu{position:absolute;top:52px;right:1.25rem;background:#14141C;border:1px solid #1E1E2E;border-radius:12px;padding:0.5rem;min-width:160px;z-index:100;display:none;box-shadow:0 8px 24px #00000066}
+.avatar-menu.open{display:block}
+.avatar-menu-name{font-size:13px;font-weight:500;padding:8px 12px;color:#888;border-bottom:1px solid #1E1E2E;margin-bottom:4px}
+.avatar-menu-item{display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:8px;font-size:13px;cursor:pointer;color:#F0EEF8;transition:background 0.15s}
+.avatar-menu-item:hover{background:#1E1E2E}
+.avatar-menu-item.danger{color:#F87171}
 .dash{max-width:420px;margin:0 auto;padding-bottom:2rem}
 .period-tabs{padding:0.75rem 1.25rem;display:flex;gap:4px}
 .ptab{flex:1;text-align:center;padding:6px 0;font-size:12px;font-weight:500;border-radius:8px;cursor:pointer;color:#555;transition:all 0.15s;border:none;background:none}
@@ -103,7 +109,13 @@ body{font-family:'DM Sans',sans-serif;background:#0A0A0F;color:#F0EEF8;min-heigh
 <div class="screen" id="screen-dash">
   <div class="header">
     <div style="display:flex;align-items:center;gap:10px"><img src="https://gptriade.com.br/wp-content/uploads/2023/01/Logo-Triade-1-300x100.png" style="height:24px;width:auto;" alt="Agência Tríade"/></div>
-    <div style="display:flex;align-items:center;gap:12px"><div class="header-logo">meta<span>dash</span></div><div class="avatar" id="avatar" onclick="doLogout()">--</div></div>
+    <div style="display:flex;align-items:center;gap:12px"><div class="header-logo">meta<span>dash</span></div><div class="avatar" id="avatar" onclick="toggleMenu()">--</div>
+      <div class="avatar-menu" id="avatar-menu">
+        <div class="avatar-menu-name" id="menu-name">--</div>
+        <div class="avatar-menu-item danger" onclick="doLogout()">
+          <span>&#x2192;</span> Sair
+        </div>
+      </div></div>
   </div>
   <div class="dash">
     <div class="period-tabs">
@@ -140,6 +152,7 @@ async function doLogin() {
   document.getElementById('error-msg').style.display = 'none';
   currentClient = client;
   document.getElementById('avatar').textContent = client.name.slice(0,2).toUpperCase();
+  document.getElementById('menu-name').textContent = client.name;
   document.getElementById('screen-login').classList.remove('active');
   document.getElementById('screen-dash').classList.add('active');
   sessionStorage.setItem('metadash_email', email);
@@ -278,6 +291,18 @@ function setPeriod(p, el) {
   el.classList.add('active');
   loadDash();
 }
+
+function toggleMenu() {
+  document.getElementById('avatar-menu').classList.toggle('open');
+}
+
+document.addEventListener('click', function(e) {
+  const menu = document.getElementById('avatar-menu');
+  const avatar = document.getElementById('avatar');
+  if (menu && !menu.contains(e.target) && !avatar.contains(e.target)) {
+    menu.classList.remove('open');
+  }
+});
 
 function doLogout() {
   currentClient = null;
