@@ -95,12 +95,11 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .bar-label{font-size:8px;color:var(--text4);font-family:'DM Mono',monospace}
 .toggle-row{display:flex;align-items:center;justify-content:space-between;margin:0 1.25rem 0.75rem;padding:10px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:10px}
 .toggle-label{font-size:13px;color:var(--text);font-weight:500}
-.toggle{position:relative;width:44px;height:26px;flex-shrink:0}
-.toggle input{opacity:0;width:0;height:0}
-.toggle-track{position:absolute;inset:0;background:#333;border-radius:13px;transition:background 0.2s;cursor:pointer}
-.toggle-track::before{content:'';position:absolute;width:20px;height:20px;left:3px;top:3px;background:#fff;border-radius:50%;transition:transform 0.2s;box-shadow:0 1px 3px #0004}
-input:checked + .toggle-track{background:#34D399}
-input:checked + .toggle-track::before{transform:translateX(18px)}
+.ios-toggle{position:relative;display:inline-block;width:44px;height:26px;flex-shrink:0;cursor:pointer}
+.ios-toggle-track{position:absolute;inset:0;background:#555;border-radius:13px;transition:background 0.25s}
+.ios-toggle-thumb{position:absolute;width:20px;height:20px;left:3px;top:3px;background:#fff;border-radius:50%;transition:transform 0.25s;box-shadow:0 1px 4px #0005}
+.ios-toggle.active .ios-toggle-track{background:#34D399}
+.ios-toggle.active .ios-toggle-thumb{transform:translateX(18px)}
 .camp-list{padding:0 1.25rem;margin-bottom:1rem;display:flex;flex-direction:column;gap:8px}
 .camp-item{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:1rem;display:flex;align-items:center;gap:12px;cursor:pointer;transition:border-color 0.15s}
 .camp-item:active{border-color:var(--purple)55}
@@ -296,10 +295,10 @@ function renderDash(campaigns, daily, spendVal, impressionsVal, clicksVal, conve
     <div class="section-title">Campanhas</div>
     <div class="toggle-row">
       <span class="toggle-label">Apenas campanhas ativas</span>
-      <label class="toggle">
-        <input type="checkbox" id="btn-only-active" checked onchange="toggleOnlyActive()"/>
-        <span class="toggle-track"></span>
-      </label>
+      <div class="ios-toggle active" id="toggle-active" onclick="toggleOnlyActive()">
+        <div class="ios-toggle-track"></div>
+        <div class="ios-toggle-thumb"></div>
+      </div>
     </div>
     <div class="camp-list">${campsHtml}</div>
   `;
@@ -425,7 +424,13 @@ function setPeriod(p, el) {
 }
 
 function toggleOnlyActive() {
-  onlyActive = document.getElementById('btn-only-active').checked;
+  const toggle = document.getElementById('toggle-active');
+  onlyActive = !onlyActive;
+  if (onlyActive) {
+    toggle.classList.add('active');
+  } else {
+    toggle.classList.remove('active');
+  }
   applyFilter();
 }
 
