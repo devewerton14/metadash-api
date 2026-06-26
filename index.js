@@ -178,7 +178,8 @@ app.get('/campaign/:campaignId', async (req, res) => {
 // Renova tokens automaticamente
 async function renewTokens() {
   try {
-    const { data: accounts } = await supabase.from('ad_accounts').select('*');
+    const { data: accounts, error } = await supabase.from('ad_accounts').select('*');
+    if (error || !accounts) { console.error('Erro ao buscar contas:', error); return; }
     for (const acc of accounts) {
       try {
         const res = await axios.get('https://graph.facebook.com/v19.0/oauth/access_token', {
