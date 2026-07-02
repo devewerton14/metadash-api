@@ -175,7 +175,7 @@ app.get('/campaign/:campaignId', async (req, res) => {
   }
 });
 
-// Lista todas as campanhas de uma conta, sem filtro de status
+// Lista campanhas de uma conta (ativas, pausadas e arquivadas), com paginação
 app.get('/campaigns/:accountId', async (req, res) => {
   try {
     const { data: account } = await supabase
@@ -183,15 +183,21 @@ app.get('/campaigns/:accountId', async (req, res) => {
       .eq('id', req.params.accountId).single();
     if (!account) return res.status(404).json({ error: 'Conta não encontrada' });
 
-    const campRes = await axios.get(
-      `https://graph.facebook.com/v19.0/${account.account_id}/campaigns`,
-      { params: {
-        access_token: account.access_token,
-        fields: 'id,name,status,effective_status',
-        limit: 500,
-      }}
-    );
-    res.json(campRes.data.data || []);
+    let campaigns = [];
+    let url = `https://graph.facebook.com/v19.0/${account.account_id}/campaigns`;
+    let params = {
+      access_token: account.access_token,
+      fields: 'id,name,status,effective_status',
+      effective_status: ['ACTIVE', 'PAUSED', 'ARCHIVED'],
+      limit: 500,
+    };
+    while (url) {
+      const campRes = await axios.get(url, params ? { params } : undefined);
+      campaigns = campaigns.concat(campRes.data.data || []);
+      url = campRes.data.paging && campRes.data.paging.next ? campRes.data.paging.next : null;
+      params = null;
+    }
+    res.json(campaigns);
   } catch (err) {
     console.error(err?.response?.data || err.message);
     res.status(500).json({ error: 'Erro ao buscar campanhas' });

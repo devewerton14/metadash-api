@@ -273,7 +273,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
       </div>
       <div id="view-polo" style="display:none">
         <div class="dash">
-          <div class="client-name">Resumo por Polo</div>
+          <div class="client-name" id="polo-title">Resumo por Polo</div>
           <div class="polo-filter">
             <div class="polo-filter-field">
               <div class="polo-label">Início</div>
@@ -309,23 +309,72 @@ let rawMetrics = null;
 let onlyActive = true;
 let accountStatus = 1;
 
-const POLOS_UNINGA = [
-  { nome: 'Toledo', termos: ['toledo'] },
-  { nome: 'São José do Rio Preto', termos: ['sjrp', 'rio preto'] },
-  { nome: 'Santa Helena', termos: ['sh', 'santa helena'] },
-  { nome: 'Marechal Cândido Rondon', termos: ['mcr', 'marechal rondon'] },
-  { nome: 'Missal', termos: ['missal'] },
-  { nome: 'Birigui', termos: ['birigui', 'birigüi'] },
-  { nome: 'Araçatuba', termos: ['araçatuba', 'aracatuba'] },
-  { nome: 'Itaipulândia', termos: ['itaipulandia', 'itaipulândia'] },
-  { nome: 'Marília', termos: ['marilia', 'marília'] },
-  { nome: 'Mirassol', termos: ['mirassol'] },
-];
-const UNINGA_CLIENT_ID = '44444444-4444-4444-4444-444444444444';
-const UNINGA_ACCOUNT_ID = 'act_466229668843496';
+const POLOS_CONFIG = {
+  '44444444-4444-4444-4444-444444444444': { // Uningá - act_466229668843496
+    nome: 'Uningá',
+    polos: [
+      { nome: 'Toledo', termos: ['toledo'] },
+      { nome: 'São José do Rio Preto', termos: ['sjrp', 'rio preto'] },
+      { nome: 'Santa Helena', termos: ['sh', 'santa helena'] },
+      { nome: 'Marechal Cândido Rondon', termos: ['mcr', 'marechal rondon'] },
+      { nome: 'Missal', termos: ['missal'] },
+      { nome: 'Birigui', termos: ['birigui', 'birigüi'] },
+      { nome: 'Araçatuba', termos: ['araçatuba', 'aracatuba'] },
+      { nome: 'Itaipulândia', termos: ['itaipulandia', 'itaipulândia'] },
+      { nome: 'Marília', termos: ['marilia', 'marília'] },
+      { nome: 'Mirassol', termos: ['mirassol'] },
+    ]
+  },
+  '55555555-5555-5555-5555-555555555555': { // Mestra-EAD-Uningá - act_725071917282682
+    nome: 'Mestra-EAD',
+    polos: [
+      { nome: 'Abelardo Luz', termos: ['abelardo'] },
+      { nome: 'Ampere', termos: ['ampere', 'ampére'] },
+      { nome: 'Assis', termos: ['assis'] },
+      { nome: 'Barracão', termos: ['barracão', 'barracao'] },
+      { nome: 'Cafelândia', termos: ['cafelândia', 'cafelandia'] },
+      { nome: 'Campina da Lagoa', termos: ['campina'] },
+      { nome: 'Capanema', termos: ['capanema'] },
+      { nome: 'Capitão', termos: ['capitão', 'capitao'] },
+      { nome: 'Cascavel', termos: ['cascavel'] },
+      { nome: 'Céu Azul', termos: ['céu azul', 'ceu azul'] },
+      { nome: 'Chopinzinho', termos: ['chopinzinho'] },
+      { nome: 'Clevelândia', termos: ['clevelândia', 'clevelandia'] },
+      { nome: 'Coronel Vivida', termos: ['vivida'] },
+      { nome: 'Dois Vizinhos', termos: ['dois vizinhos'] },
+      { nome: 'Foz do Iguaçu', termos: ['foz'] },
+      { nome: 'Francisco Beltrão', termos: ['beltrão', 'beltrao'] },
+      { nome: 'General Carneiro', termos: ['carneiro'] },
+      { nome: 'Guaraniaçu', termos: ['guaraniaçu', 'guaraniacu'] },
+      { nome: 'Itapejara do Oeste', termos: ['itapejara'] },
+      { nome: 'Laranjeiras do Sul', termos: ['laranjeiras'] },
+      { nome: 'Mamborê', termos: ['mamborê', 'mambore'] },
+      { nome: 'Mangueirinha', termos: ['mangueirinha'] },
+      { nome: 'Marmeleiro', termos: ['marmeleiro'] },
+      { nome: 'Matelândia', termos: ['matelândia', 'matelandia'] },
+      { nome: 'Medianeira', termos: ['medianeira'] },
+      { nome: 'Nova Aurora', termos: ['nova aurora'] },
+      { nome: 'Palmas', termos: ['palmas'] },
+      { nome: 'Palotina', termos: ['palotina'] },
+      { nome: 'Pato Branco', termos: ['pato branco'] },
+      { nome: 'Quedas do Iguaçu', termos: ['quedas'] },
+      { nome: 'Realeza', termos: ['realeza'] },
+      { nome: 'Salto do Lontra', termos: ['lontra'] },
+      { nome: 'Santa Tereza do Oeste', termos: ['santa tereza'] },
+      { nome: 'São João', termos: ['são joão', 'sao joao'] },
+      { nome: 'São Lourenço do Oeste', termos: ['lourenço', 'lourenco'] },
+      { nome: 'São Miguel do Iguaçu', termos: ['são miguel', 'sao miguel'] },
+      { nome: 'Santo Antônio do Sudoeste', termos: ['sudoeste', 'sto antonio'] },
+      { nome: 'Terra Roxa', termos: ['terra roxa'] },
+      { nome: 'Três Barras', termos: ['três barras', 'tres barras'] },
+      { nome: 'Ubiratã', termos: ['ubiratã', 'ubirata'] },
+    ]
+  }
+};
 let poloAccountUuid = null;
 let poloCampaigns = null;
-let poloLoaded = false;
+let poloLoadedForClient = null;
+let lastPoloRows = null;
 
 async function doLogin() {
   const email = document.getElementById('login-email').value.trim();
@@ -346,12 +395,12 @@ async function doLogin() {
 }
 
 function togglePoloMenu() {
-  const isUninga = currentClient && currentClient.id === UNINGA_CLIENT_ID;
+  const hasPolos = currentClient && !!POLOS_CONFIG[currentClient.id];
   const navPolo = document.getElementById('nav-polo');
   const tabPolo = document.getElementById('view-tab-polo');
-  if (navPolo) navPolo.style.display = isUninga ? '' : 'none';
-  if (tabPolo) tabPolo.style.display = isUninga ? '' : 'none';
-  if (!isUninga) showView('dash');
+  if (navPolo) navPolo.style.display = hasPolos ? '' : 'none';
+  if (tabPolo) tabPolo.style.display = hasPolos ? '' : 'none';
+  if (!hasPolos) showView('dash');
 }
 
 async function loadDash() {
@@ -595,8 +644,11 @@ function showView(view) {
   if (tabDash) tabDash.classList.toggle('active', !isPolo);
   if (tabPolo) tabPolo.classList.toggle('active', isPolo);
 
-  if (isPolo && !poloLoaded) {
-    poloLoaded = true;
+  if (isPolo && currentClient && poloLoadedForClient !== currentClient.id) {
+    poloLoadedForClient = currentClient.id;
+    const config = POLOS_CONFIG[currentClient.id];
+    const title = document.getElementById('polo-title');
+    if (title && config) title.textContent = `Resumo por Polo — ${config.nome}`;
     const end = new Date();
     const start = new Date();
     start.setDate(start.getDate() - 30);
@@ -606,17 +658,21 @@ function showView(view) {
   }
 }
 
-function matchPolo(campaignName) {
-  const lower = (campaignName || '').toLowerCase();
-  return POLOS_UNINGA.find(p => p.termos.some(t => lower.includes(t.toLowerCase())));
+function normalizeStr(s) {
+  return (s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+}
+
+function matchPolo(campaignName, polos) {
+  const norm = normalizeStr(campaignName);
+  return polos.find(p => p.termos.some(t => norm.includes(normalizeStr(t))));
 }
 
 async function ensurePoloAccount() {
   if (poloAccountUuid) return poloAccountUuid;
-  const res = await fetch(`${API}/accounts/${UNINGA_CLIENT_ID}`);
+  const res = await fetch(`${API}/accounts/${currentClient.id}`);
   const accounts = await res.json();
-  const acc = accounts.find(a => a.account_id === UNINGA_ACCOUNT_ID) || accounts[0];
-  if (!acc) throw new Error('Conta Uningá não encontrada');
+  const acc = accounts[0];
+  if (!acc) throw new Error('Conta não encontrada');
   poloAccountUuid = acc.id;
   return poloAccountUuid;
 }
@@ -630,47 +686,72 @@ async function ensurePoloCampaigns() {
 }
 
 async function loadPoloSummary() {
+  const config = POLOS_CONFIG[currentClient.id];
   const since = document.getElementById('polo-start').value;
   const until = document.getElementById('polo-end').value;
   const content = document.getElementById('polo-content');
+  if (!config) return;
   if (!since || !until) {
     content.innerHTML = '<div class="loading">Selecione a data de início e fim.</div>';
     return;
   }
+  const diffDays = (new Date(until) - new Date(since)) / (1000 * 60 * 60 * 24);
+  if (diffDays < 0) {
+    content.innerHTML = '<div class="loading">⚠️ Data de início deve ser anterior à data de fim.</div>';
+    return;
+  }
+  if (diffDays > 90) {
+    content.innerHTML = '<div class="loading">⚠️ Período máximo de 90 dias</div>';
+    return;
+  }
+
   content.innerHTML = '<div class="loading"><span class="spinner"></span>Carregando resumo...</div>';
   try {
     const accUuid = await ensurePoloAccount();
     const campaigns = await ensurePoloCampaigns();
 
     const poloMap = {};
-    POLOS_UNINGA.forEach(p => poloMap[p.nome] = []);
+    config.polos.forEach(p => poloMap[p.nome] = []);
+    const outrosIds = [];
     campaigns.forEach(c => {
-      const match = matchPolo(c.name);
+      const match = matchPolo(c.name, config.polos);
       if (match) poloMap[match.nome].push(c.id);
+      else outrosIds.push(c.id);
     });
 
-    const allIds = Object.values(poloMap).flat();
+    const allIds = Object.values(poloMap).flat().concat(outrosIds);
     if (!allIds.length) {
-      content.innerHTML = '<div class="loading">Nenhuma campanha de polo encontrada.</div>';
+      content.innerHTML = '<div class="loading">Nenhuma campanha encontrada nesta conta.</div>';
       return;
     }
 
-    const metRes = await fetch(`${API}/metrics-campaigns-date`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ campaignIds: allIds, accountId: accUuid, since, until }),
-    });
-    const data = await metRes.json();
-    if (data.error) { content.innerHTML = '<div class="loading">Erro ao carregar métricas dos polos.</div>'; return; }
+    const chunkSize = 50;
+    const chunks = [];
+    for (let i = 0; i < allIds.length; i += chunkSize) chunks.push(allIds.slice(i, i + chunkSize));
 
     const spendByCampaign = {};
-    (data.results || []).forEach(r => spendByCampaign[r.campaignId] = r.spend || 0);
+    for (let i = 0; i < chunks.length; i++) {
+      if (chunks.length > 1) {
+        content.innerHTML = `<div class="loading"><span class="spinner"></span>Buscando métricas... (lote ${i + 1} de ${chunks.length})</div>`;
+      }
+      const metRes = await fetch(`${API}/metrics-campaigns-date`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ campaignIds: chunks[i], accountId: accUuid, since, until }),
+      });
+      const data = await metRes.json();
+      if (data.error) { content.innerHTML = '<div class="loading">Erro ao carregar métricas dos polos.</div>'; return; }
+      (data.results || []).forEach(r => spendByCampaign[r.campaignId] = r.spend || 0);
+    }
 
-    const rows = POLOS_UNINGA.map(p => ({
+    const rows = config.polos.map(p => ({
       nome: p.nome,
       spend: poloMap[p.nome].reduce((sum, id) => sum + (spendByCampaign[id] || 0), 0),
-    })).sort((a, b) => b.spend - a.spend);
+    }));
+    const outrosSpend = outrosIds.reduce((sum, id) => sum + (spendByCampaign[id] || 0), 0);
+    if (outrosIds.length) rows.push({ nome: 'Outros', spend: outrosSpend });
 
+    rows.sort((a, b) => b.spend - a.spend);
     renderPoloSummary(rows);
   } catch (err) {
     content.innerHTML = '<div class="loading">Erro ao carregar resumo por polo.</div>';
@@ -680,18 +761,24 @@ async function loadPoloSummary() {
 function renderPoloSummary(rows) {
   const total = rows.reduce((a, r) => a + r.spend, 0);
   const fmt = v => v.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const pct = v => total > 0 ? ((v / total) * 100).toFixed(1) + '%' : '0%';
 
-  const rowsHtml = rows.map(r => `<tr><td>${r.nome}</td><td style="text-align:right">R$ ${fmt(r.spend)}</td></tr>`).join('');
+  lastPoloRows = rows;
+
+  const rowsHtml = rows.map(r => `<tr><td>${r.nome}</td><td style="text-align:right">R$ ${fmt(r.spend)}</td><td style="text-align:right">${pct(r.spend)}</td></tr>`).join('');
   const cardsHtml = rows.map(r => `
-    <div class="polo-card"><div class="polo-card-name">${r.nome}</div><div class="polo-card-spend">R$ ${fmt(r.spend)}</div></div>
+    <div class="polo-card"><div class="polo-card-name">${r.nome}</div><div style="text-align:right"><div class="polo-card-spend">R$ ${fmt(r.spend)}</div><div style="font-size:11px;color:var(--text3)">${pct(r.spend)}</div></div></div>
   `).join('');
 
   document.getElementById('polo-content').innerHTML = `
+    <div style="padding:0 1.25rem;margin-bottom:0.75rem;display:flex;justify-content:flex-end">
+      <button class="filter-clear" style="display:block;width:auto;color:var(--text2);border-color:var(--border2)" onclick="exportPoloCsv()">⬇ Exportar CSV</button>
+    </div>
     <div class="polo-table-wrap desktop-only">
       <table class="polo-table">
-        <thead><tr><th>Polo</th><th style="text-align:right">Gasto no período</th></tr></thead>
+        <thead><tr><th>Polo</th><th style="text-align:right">Gasto no período</th><th style="text-align:right">% do Total</th></tr></thead>
         <tbody>${rowsHtml}</tbody>
-        <tfoot><tr><td>Total</td><td style="text-align:right">R$ ${fmt(total)}</td></tr></tfoot>
+        <tfoot><tr><td>Total</td><td style="text-align:right">R$ ${fmt(total)}</td><td style="text-align:right">100%</td></tr></tfoot>
       </table>
     </div>
     <div class="mobile-only">
@@ -699,6 +786,24 @@ function renderPoloSummary(rows) {
       <div class="polo-total-card"><div class="polo-card-name">Total</div><div class="polo-card-spend">R$ ${fmt(total)}</div></div>
     </div>
   `;
+}
+
+function exportPoloCsv() {
+  if (!lastPoloRows) return;
+  const total = lastPoloRows.reduce((a, r) => a + r.spend, 0);
+  const lines = [['Polo', 'Gasto', '% do Total'].join(';')];
+  lastPoloRows.forEach(r => {
+    const pct = total > 0 ? ((r.spend / total) * 100).toFixed(1) : '0';
+    lines.push([r.nome, r.spend.toFixed(2).replace('.', ','), pct.replace('.', ',') + '%'].join(';'));
+  });
+  lines.push(['Total', total.toFixed(2).replace('.', ','), '100%'].join(';'));
+  const blob = new Blob(['﻿' + lines.join('\n')], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `resumo-por-polo-${document.getElementById('polo-start').value}-a-${document.getElementById('polo-end').value}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
 }
 
 function setPeriod(p, el) {
@@ -758,9 +863,10 @@ document.addEventListener('click', function(e) {
 function doLogout() {
   currentClient = null;
   rawMetrics = null;
-  poloLoaded = false;
+  poloLoadedForClient = null;
   poloAccountUuid = null;
   poloCampaigns = null;
+  lastPoloRows = null;
   sessionStorage.removeItem('metadash_email');
   document.getElementById('screen-dash').classList.remove('active');
   showView('dash');
