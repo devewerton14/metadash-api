@@ -158,6 +158,25 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .modal-card .mc-value{font-size:18px}
 .close-btn{width:100%;background:var(--bg2);border:1px solid var(--border2);border-radius:10px;padding:12px;font-size:14px;font-family:'DM Sans',sans-serif;color:var(--text2);cursor:pointer;margin-top:0.5rem}
 .modal-loading{text-align:center;padding:2rem;color:var(--text3);font-size:13px}
+.view-tabs{padding:0.75rem 1.25rem 0;display:flex;gap:4px}
+.view-tab{flex:1;text-align:center;padding:8px 0;font-size:12px;font-weight:600;border-radius:8px;cursor:pointer;color:var(--text3);border:none;background:var(--bg2);transition:all 0.15s}
+.view-tab.active{background:var(--purple-dim);color:var(--purple)}
+.polo-label{font-size:11px;text-transform:uppercase;letter-spacing:1.2px;color:var(--text3);margin-bottom:4px;font-weight:500}
+.polo-filter{padding:0.75rem 1.25rem;margin-bottom:0.5rem;display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end}
+.polo-filter-field{flex:1;min-width:130px}
+.polo-btn{background:var(--purple);border:none;border-radius:10px;padding:11px 20px;font-size:13px;font-family:'DM Sans',sans-serif;font-weight:500;color:#fff;cursor:pointer;transition:opacity 0.2s}
+.polo-btn:active{opacity:0.85}
+.polo-table-wrap{padding:0 1.25rem;margin-bottom:1rem;overflow-x:auto}
+.polo-table{width:100%;border-collapse:collapse;background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.polo-table th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:0.6px;color:var(--text3);font-weight:500;padding:12px 16px;border-bottom:1px solid var(--border)}
+.polo-table td{padding:12px 16px;font-size:13px;border-bottom:1px solid var(--border)}
+.polo-table tbody tr:last-child td{border-bottom:none}
+.polo-table tfoot td{font-weight:600;color:var(--purple);border-top:2px solid var(--border2);border-bottom:none}
+.polo-cards{padding:0 1.25rem;display:flex;flex-direction:column;gap:8px;margin-bottom:0.75rem}
+.polo-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:1rem;display:flex;justify-content:space-between;align-items:center}
+.polo-card-name{font-size:13px;font-weight:500}
+.polo-card-spend{font-size:14px;font-weight:600;color:var(--purple);font-family:'DM Mono',monospace}
+.polo-total-card{margin:0 1.25rem 1rem;background:var(--purple-dim);border:1px solid var(--purple-border);border-radius:12px;padding:1rem;display:flex;justify-content:space-between;align-items:center}
 </style>
 </head>
 <body>
@@ -195,36 +214,44 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
       <div>
         <div class="sidebar-title">Menu</div>
         <div class="sidebar-nav">
-          <div class="sidebar-nav-item active">📊 Dashboard</div>
+          <div class="sidebar-nav-item active" id="nav-dash" onclick="showView('dash')">📊 Dashboard</div>
+          <div class="sidebar-nav-item" id="nav-polo" onclick="showView('polo')">📍 Resumo por Polo</div>
         </div>
       </div>
-      <div class="sidebar-divider"></div>
-      <div>
-        <div class="sidebar-title">Período</div>
-        <div class="period-tabs" style="flex-direction:column;gap:4px;padding:0">
-          <button class="ptab desktop-period active" onclick="setPeriod('7d',this)">7 dias</button>
-          <button class="ptab desktop-period" onclick="setPeriod('30d',this)">30 dias</button>
-          <button class="ptab desktop-period" onclick="setPeriod('90d',this)">90 dias</button>
+      <div id="sidebar-dash-only">
+        <div class="sidebar-divider"></div>
+        <div>
+          <div class="sidebar-title">Período</div>
+          <div class="period-tabs" style="flex-direction:column;gap:4px;padding:0">
+            <button class="ptab desktop-period active" onclick="setPeriod('7d',this)">7 dias</button>
+            <button class="ptab desktop-period" onclick="setPeriod('30d',this)">30 dias</button>
+            <button class="ptab desktop-period" onclick="setPeriod('90d',this)">90 dias</button>
+          </div>
         </div>
-      </div>
-      <div class="sidebar-divider"></div>
-      <div style="display:flex;flex-direction:column;gap:8px">
-        <div class="sidebar-title">Filtros</div>
-        <input class="filter-input" type="text" id="filter-name-desk" placeholder="🔍 Buscar campanha..." oninput="syncFilter('name')"/>
-        <input class="filter-input" type="date" id="filter-start-desk" onchange="syncFilter('start')" placeholder="Data início"/>
-        <input class="filter-input" type="date" id="filter-end-desk" onchange="syncFilter('end')"/>
-        <button class="filter-clear" id="filter-clear-desk" onclick="clearFilter()" style="display:none">✕ Limpar filtro</button>
-      </div>
-      <div class="sidebar-divider"></div>
-      <div>
-        <div class="sidebar-title">Campanhas</div>
-        <div style="display:flex;flex-direction:column;gap:6px;margin-top:0.25rem">
-          <div id="sb-btn-ativas" style="padding:8px 12px;border-radius:10px;font-size:12px;font-weight:600;text-align:center;cursor:pointer;background:#34D399;border:2px solid #34D399;color:#000" onclick="setCampFilter(true)">● Apenas ativas</div>
-          <div id="sb-btn-todas" style="padding:8px 12px;border-radius:10px;font-size:12px;font-weight:600;text-align:center;cursor:pointer;background:transparent;border:2px solid #333;color:#555" onclick="setCampFilter(false)">○ Todas</div>
+        <div class="sidebar-divider"></div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div class="sidebar-title">Filtros</div>
+          <input class="filter-input" type="text" id="filter-name-desk" placeholder="🔍 Buscar campanha..." oninput="syncFilter('name')"/>
+          <input class="filter-input" type="date" id="filter-start-desk" onchange="syncFilter('start')" placeholder="Data início"/>
+          <input class="filter-input" type="date" id="filter-end-desk" onchange="syncFilter('end')"/>
+          <button class="filter-clear" id="filter-clear-desk" onclick="clearFilter()" style="display:none">✕ Limpar filtro</button>
+        </div>
+        <div class="sidebar-divider"></div>
+        <div>
+          <div class="sidebar-title">Campanhas</div>
+          <div style="display:flex;flex-direction:column;gap:6px;margin-top:0.25rem">
+            <div id="sb-btn-ativas" style="padding:8px 12px;border-radius:10px;font-size:12px;font-weight:600;text-align:center;cursor:pointer;background:#34D399;border:2px solid #34D399;color:#000" onclick="setCampFilter(true)">● Apenas ativas</div>
+            <div id="sb-btn-todas" style="padding:8px 12px;border-radius:10px;font-size:12px;font-weight:600;text-align:center;cursor:pointer;background:transparent;border:2px solid #333;color:#555" onclick="setCampFilter(false)">○ Todas</div>
+          </div>
         </div>
       </div>
     </aside>
     <div class="dash-main">
+      <div class="view-tabs mobile-only">
+        <div class="view-tab active" id="view-tab-dash" onclick="showView('dash')">📊 Dashboard</div>
+        <div class="view-tab" id="view-tab-polo" onclick="showView('polo')">📍 Resumo por Polo</div>
+      </div>
+      <div id="view-dash">
       <div class="dash mobile-period-tabs">
     <div class="period-tabs mobile-only">
       <button class="ptab active" onclick="setPeriod('7d',this)">7 dias</button>
@@ -242,6 +269,24 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     <div class="filter-summary" id="filter-summary"></div>
     <div id="dash-content"><div class="loading"><span class="spinner"></span>Carregando métricas...</div></div>
 
+      </div>
+      </div>
+      <div id="view-polo" style="display:none">
+        <div class="dash">
+          <div class="client-name">Resumo por Polo</div>
+          <div class="polo-filter">
+            <div class="polo-filter-field">
+              <div class="polo-label">Início</div>
+              <input class="filter-input" type="date" id="polo-start"/>
+            </div>
+            <div class="polo-filter-field">
+              <div class="polo-label">Fim</div>
+              <input class="filter-input" type="date" id="polo-end"/>
+            </div>
+            <button class="polo-btn" onclick="loadPoloSummary()">Buscar</button>
+          </div>
+          <div id="polo-content"><div class="loading"><span class="spinner"></span>Carregando resumo...</div></div>
+        </div>
       </div>
     </div>
   </div>
@@ -264,6 +309,24 @@ let rawMetrics = null;
 let onlyActive = true;
 let accountStatus = 1;
 
+const POLOS_UNINGA = [
+  { nome: 'Toledo', termos: ['toledo'] },
+  { nome: 'São José do Rio Preto', termos: ['sjrp', 'rio preto'] },
+  { nome: 'Santa Helena', termos: ['sh', 'santa helena'] },
+  { nome: 'Marechal Cândido Rondon', termos: ['mcr', 'marechal rondon'] },
+  { nome: 'Missal', termos: ['missal'] },
+  { nome: 'Birigui', termos: ['birigui', 'birigüi'] },
+  { nome: 'Araçatuba', termos: ['araçatuba', 'aracatuba'] },
+  { nome: 'Itaipulândia', termos: ['itaipulandia', 'itaipulândia'] },
+  { nome: 'Marília', termos: ['marilia', 'marília'] },
+  { nome: 'Mirassol', termos: ['mirassol'] },
+];
+const UNINGA_CLIENT_ID = '44444444-4444-4444-4444-444444444444';
+const UNINGA_ACCOUNT_ID = 'act_466229668843496';
+let poloAccountUuid = null;
+let poloCampaigns = null;
+let poloLoaded = false;
+
 async function doLogin() {
   const email = document.getElementById('login-email').value.trim();
   if (!email) return;
@@ -278,7 +341,17 @@ async function doLogin() {
   document.getElementById('screen-login').classList.remove('active');
   document.getElementById('screen-dash').classList.add('active');
   sessionStorage.setItem('metadash_email', email);
+  togglePoloMenu();
   loadDash();
+}
+
+function togglePoloMenu() {
+  const isUninga = currentClient && currentClient.id === UNINGA_CLIENT_ID;
+  const navPolo = document.getElementById('nav-polo');
+  const tabPolo = document.getElementById('view-tab-polo');
+  if (navPolo) navPolo.style.display = isUninga ? '' : 'none';
+  if (tabPolo) tabPolo.style.display = isUninga ? '' : 'none';
+  if (!isUninga) showView('dash');
 }
 
 async function loadDash() {
@@ -507,6 +580,127 @@ function fmtObjective(o) {
   return map[o] || o || 'Campanha';
 }
 
+function showView(view) {
+  const isPolo = view === 'polo';
+  document.getElementById('view-dash').style.display = isPolo ? 'none' : '';
+  document.getElementById('view-polo').style.display = isPolo ? '' : 'none';
+  const sidebarExtra = document.getElementById('sidebar-dash-only');
+  if (sidebarExtra) sidebarExtra.style.display = isPolo ? 'none' : '';
+  const navDash = document.getElementById('nav-dash');
+  const navPolo = document.getElementById('nav-polo');
+  if (navDash) navDash.classList.toggle('active', !isPolo);
+  if (navPolo) navPolo.classList.toggle('active', isPolo);
+  const tabDash = document.getElementById('view-tab-dash');
+  const tabPolo = document.getElementById('view-tab-polo');
+  if (tabDash) tabDash.classList.toggle('active', !isPolo);
+  if (tabPolo) tabPolo.classList.toggle('active', isPolo);
+
+  if (isPolo && !poloLoaded) {
+    poloLoaded = true;
+    const end = new Date();
+    const start = new Date();
+    start.setDate(start.getDate() - 30);
+    document.getElementById('polo-end').value = end.toISOString().split('T')[0];
+    document.getElementById('polo-start').value = start.toISOString().split('T')[0];
+    loadPoloSummary();
+  }
+}
+
+function matchPolo(campaignName) {
+  const lower = (campaignName || '').toLowerCase();
+  return POLOS_UNINGA.find(p => p.termos.some(t => lower.includes(t.toLowerCase())));
+}
+
+async function ensurePoloAccount() {
+  if (poloAccountUuid) return poloAccountUuid;
+  const res = await fetch(`${API}/accounts/${UNINGA_CLIENT_ID}`);
+  const accounts = await res.json();
+  const acc = accounts.find(a => a.account_id === UNINGA_ACCOUNT_ID) || accounts[0];
+  if (!acc) throw new Error('Conta Uningá não encontrada');
+  poloAccountUuid = acc.id;
+  return poloAccountUuid;
+}
+
+async function ensurePoloCampaigns() {
+  if (poloCampaigns) return poloCampaigns;
+  const accUuid = await ensurePoloAccount();
+  const res = await fetch(`${API}/campaigns/${accUuid}`);
+  poloCampaigns = await res.json();
+  return poloCampaigns;
+}
+
+async function loadPoloSummary() {
+  const since = document.getElementById('polo-start').value;
+  const until = document.getElementById('polo-end').value;
+  const content = document.getElementById('polo-content');
+  if (!since || !until) {
+    content.innerHTML = '<div class="loading">Selecione a data de início e fim.</div>';
+    return;
+  }
+  content.innerHTML = '<div class="loading"><span class="spinner"></span>Carregando resumo...</div>';
+  try {
+    const accUuid = await ensurePoloAccount();
+    const campaigns = await ensurePoloCampaigns();
+
+    const poloMap = {};
+    POLOS_UNINGA.forEach(p => poloMap[p.nome] = []);
+    campaigns.forEach(c => {
+      const match = matchPolo(c.name);
+      if (match) poloMap[match.nome].push(c.id);
+    });
+
+    const allIds = Object.values(poloMap).flat();
+    if (!allIds.length) {
+      content.innerHTML = '<div class="loading">Nenhuma campanha de polo encontrada.</div>';
+      return;
+    }
+
+    const metRes = await fetch(`${API}/metrics-campaigns-date`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ campaignIds: allIds, accountId: accUuid, since, until }),
+    });
+    const data = await metRes.json();
+    if (data.error) { content.innerHTML = '<div class="loading">Erro ao carregar métricas dos polos.</div>'; return; }
+
+    const spendByCampaign = {};
+    (data.results || []).forEach(r => spendByCampaign[r.campaignId] = r.spend || 0);
+
+    const rows = POLOS_UNINGA.map(p => ({
+      nome: p.nome,
+      spend: poloMap[p.nome].reduce((sum, id) => sum + (spendByCampaign[id] || 0), 0),
+    })).sort((a, b) => b.spend - a.spend);
+
+    renderPoloSummary(rows);
+  } catch (err) {
+    content.innerHTML = '<div class="loading">Erro ao carregar resumo por polo.</div>';
+  }
+}
+
+function renderPoloSummary(rows) {
+  const total = rows.reduce((a, r) => a + r.spend, 0);
+  const fmt = v => v.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+  const rowsHtml = rows.map(r => `<tr><td>${r.nome}</td><td style="text-align:right">R$ ${fmt(r.spend)}</td></tr>`).join('');
+  const cardsHtml = rows.map(r => `
+    <div class="polo-card"><div class="polo-card-name">${r.nome}</div><div class="polo-card-spend">R$ ${fmt(r.spend)}</div></div>
+  `).join('');
+
+  document.getElementById('polo-content').innerHTML = `
+    <div class="polo-table-wrap desktop-only">
+      <table class="polo-table">
+        <thead><tr><th>Polo</th><th style="text-align:right">Gasto no período</th></tr></thead>
+        <tbody>${rowsHtml}</tbody>
+        <tfoot><tr><td>Total</td><td style="text-align:right">R$ ${fmt(total)}</td></tr></tfoot>
+      </table>
+    </div>
+    <div class="mobile-only">
+      <div class="polo-cards">${cardsHtml}</div>
+      <div class="polo-total-card"><div class="polo-card-name">Total</div><div class="polo-card-spend">R$ ${fmt(total)}</div></div>
+    </div>
+  `;
+}
+
 function setPeriod(p, el) {
   currentPeriod = p;
   document.querySelectorAll('.ptab').forEach(t => t.classList.remove('active'));
@@ -564,9 +758,12 @@ document.addEventListener('click', function(e) {
 function doLogout() {
   currentClient = null;
   rawMetrics = null;
+  poloLoaded = false;
+  poloAccountUuid = null;
+  poloCampaigns = null;
   sessionStorage.removeItem('metadash_email');
   document.getElementById('screen-dash').classList.remove('active');
-
+  showView('dash');
   document.getElementById('screen-login').classList.add('active');
   document.getElementById('login-email').value = '';
   document.getElementById('avatar-menu').classList.remove('open');

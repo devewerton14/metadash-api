@@ -175,6 +175,74 @@ app.get('/campaign/:campaignId', async (req, res) => {
   }
 });
 
+// Lista todas as campanhas de uma conta, sem filtro de status
+app.get('/campaigns/:accountId', async (req, res) => {
+  try {
+    const { data: account } = await supabase
+      .from('ad_accounts').select('*')
+      .eq('id', req.params.accountId).single();
+    if (!account) return res.status(404).json({ error: 'Conta não encontrada' });
+
+    const campRes = await axios.get(
+      `https://graph.facebook.com/v19.0/${account.account_id}/campaigns`,
+      { params: {
+        access_token: account.access_token,
+        fields: 'id,name,status,effective_status',
+        limit: 500,
+      }}
+    );
+    res.json(campRes.data.data || []);
+  } catch (err) {
+    console.error(err?.response?.data || err.message);
+    res.status(500).json({ error: 'Erro ao buscar campanhas' });
+  }
+});
+
+// Métricas de gasto de uma lista de campanhas em um intervalo de datas específico
+app.post('/metrics-campaigns-date', async (req, res) => {
+  const { campaignIds, accountId, since, until } = req.body || {};
+  if (!Array.isArray(campaignIds) || !campaignIds.length || !accountId || !since || !until) {
+    return res.status(400).json({ error: 'campaignIds, accountId, since e until são obrigatórios' });
+  }
+  try {
+    const { data: account } = await supabase
+      .from('ad_accounts').select('*')
+      .eq('id', accountId).single();
+    if (!account) return res.status(404).json({ error: 'Conta não encontrada' });
+
+    const results = [];
+    const chunkSize = 50;
+    for (let i = 0; i < campaignIds.length; i += chunkSize) {
+      const chunk = campaignIds.slice(i, i + chunkSize);
+      const insightsRes = await axios.get(
+        `https://graph.facebook.com/v19.0/${account.account_id}/insights`,
+        { params: {
+          access_token: account.access_token,
+          time_range: JSON.stringify({ since, until }),
+          level: 'campaign',
+          fields: 'campaign_id,spend,impressions,clicks,reach',
+          filtering: JSON.stringify([{ field: 'campaign.id', operator: 'IN', value: chunk }]),
+          limit: 500,
+        }}
+      );
+      (insightsRes.data.data || []).forEach(r => {
+        results.push({
+          campaignId: r.campaign_id,
+          spend: parseFloat(r.spend || 0),
+          impressions: parseInt(r.impressions || 0),
+          clicks: parseInt(r.clicks || 0),
+          reach: parseInt(r.reach || 0),
+        });
+      });
+    }
+
+    res.json({ results });
+  } catch (err) {
+    console.error(err?.response?.data || err.message);
+    res.status(500).json({ error: 'Erro ao buscar métricas das campanhas', detail: err?.response?.data || err.message });
+  }
+});
+
 // Renova tokens automaticamente
 async function renewTokens() {
   try {
