@@ -145,20 +145,25 @@ app.get('/campaign/:campaignId', async (req, res) => {
       { params: {
         access_token: account.access_token,
         time_range: JSON.stringify({ since: sinceStr, until: nowStr }),
-        fields: 'impressions,clicks,spend,reach,ctr,cpm,actions,frequency',
+        fields: 'impressions,clicks,spend,reach,ctr,cpm,actions,frequency,objective',
         level: 'campaign',
       }}
     );
 
     const raw = res2.data.data[0] || {};
     const actions = raw.actions || [];
-    const conversations = actions.find(a =>
-      a.action_type === 'onsite_conversion.messaging_conversation_started_7d' ||
-      a.action_type === 'onsite_conversion.total_messaging_connection' ||
-      a.action_type === 'onsite_conversion.messaging_first_reply'
-    );
+    const getAction = (type) => {
+      const found = actions.find(a => a.action_type === type);
+      return found ? parseInt(found.value) : 0;
+    };
+
+    const messagingConversationsStarted = getAction('onsite_conversion.messaging_conversation_started_7d');
+    const messagingTotalConnections = getAction('onsite_conversion.total_messaging_connection');
+    const messagingFirstReply = getAction('onsite_conversion.messaging_first_reply');
+    const conversations = messagingConversationsStarted || messagingTotalConnections || messagingFirstReply || 0;
 
     res.json({
+      objective: raw.objective || null,
       spend: parseFloat(raw.spend || 0).toFixed(2),
       impressions: parseInt(raw.impressions || 0),
       clicks: parseInt(raw.clicks || 0),
@@ -166,7 +171,16 @@ app.get('/campaign/:campaignId', async (req, res) => {
       ctr: parseFloat(raw.ctr || 0).toFixed(2),
       cpm: parseFloat(raw.cpm || 0).toFixed(2),
       frequency: parseFloat(raw.frequency || 0).toFixed(2),
-      conversations: conversations ? parseInt(conversations.value) : 0,
+      conversations,
+      messagingConversationsStarted,
+      messagingTotalConnections,
+      messagingFirstReply,
+      pageEngagement: getAction('page_engagement'),
+      postEngagement: getAction('post_engagement'),
+      linkClicks: getAction('link_click'),
+      landingPageViews: getAction('landing_page_view'),
+      instagramProfileVisits: getAction('instagram_profile_visit'),
+      pageLikes: getAction('like'),
       actions,
     });
   } catch (err) {
