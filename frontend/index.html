@@ -164,6 +164,25 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .modal-section-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.4px;color:var(--text3);margin:0.75rem 0 0.5rem}
 .close-btn{width:100%;background:var(--bg2);border:1px solid var(--border2);border-radius:10px;padding:12px;font-size:14px;font-family:'DM Sans',sans-serif;color:var(--text2);cursor:pointer;margin-top:0.5rem}
 .modal-loading{text-align:center;padding:2rem;color:var(--text3);font-size:13px}
+.view-tabs{padding:0.75rem 1.25rem 0;display:flex;gap:4px}
+.view-tab{flex:1;text-align:center;padding:8px 0;font-size:12px;font-weight:600;border-radius:8px;cursor:pointer;color:var(--text3);border:none;background:var(--bg2);transition:all 0.15s}
+.view-tab.active{background:var(--purple-dim);color:var(--purple)}
+.polo-label{font-size:11px;text-transform:uppercase;letter-spacing:1.2px;color:var(--text3);margin-bottom:4px;font-weight:500}
+.polo-filter{padding:0.75rem 1.25rem;margin-bottom:0.5rem;display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end}
+.polo-filter-field{flex:1;min-width:130px}
+.polo-btn{background:var(--purple);border:none;border-radius:10px;padding:11px 20px;font-size:13px;font-family:'DM Sans',sans-serif;font-weight:500;color:#fff;cursor:pointer;transition:opacity 0.2s}
+.polo-btn:active{opacity:0.85}
+.polo-table-wrap{padding:0 1.25rem;margin-bottom:1rem;overflow-x:auto}
+.polo-table{width:100%;border-collapse:collapse;background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.polo-table th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:0.6px;color:var(--text3);font-weight:500;padding:12px 16px;border-bottom:1px solid var(--border)}
+.polo-table td{padding:12px 16px;font-size:13px;border-bottom:1px solid var(--border)}
+.polo-table tbody tr:last-child td{border-bottom:none}
+.polo-table tfoot td{font-weight:600;color:var(--purple);border-top:2px solid var(--border2);border-bottom:none}
+.polo-cards{padding:0 1.25rem;display:flex;flex-direction:column;gap:8px;margin-bottom:0.75rem}
+.polo-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:1rem;display:flex;justify-content:space-between;align-items:center}
+.polo-card-name{font-size:13px;font-weight:500}
+.polo-card-spend{font-size:14px;font-weight:600;color:var(--purple);font-family:'DM Mono',monospace}
+.polo-total-card{margin:0 1.25rem 1rem;background:var(--purple-dim);border:1px solid var(--purple-border);border-radius:12px;padding:1rem;display:flex;justify-content:space-between;align-items:center}
 </style>
 </head>
 <body>
@@ -201,36 +220,44 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
       <div>
         <div class="sidebar-title">Menu</div>
         <div class="sidebar-nav">
-          <div class="sidebar-nav-item active">📊 Dashboard</div>
+          <div class="sidebar-nav-item active" id="nav-dash" onclick="showView('dash')">📊 Dashboard</div>
+          <div class="sidebar-nav-item" id="nav-polo" onclick="showView('polo')">📍 Resumo por Polo</div>
         </div>
       </div>
-      <div class="sidebar-divider"></div>
-      <div>
-        <div class="sidebar-title">Período</div>
-        <div class="period-tabs" style="flex-direction:column;gap:4px;padding:0">
-          <button class="ptab desktop-period active" onclick="setPeriod('7d',this)">7 dias</button>
-          <button class="ptab desktop-period" onclick="setPeriod('30d',this)">30 dias</button>
-          <button class="ptab desktop-period" onclick="setPeriod('90d',this)">90 dias</button>
+      <div id="sidebar-dash-only">
+        <div class="sidebar-divider"></div>
+        <div>
+          <div class="sidebar-title">Período</div>
+          <div class="period-tabs" style="flex-direction:column;gap:4px;padding:0">
+            <button class="ptab desktop-period active" onclick="setPeriod('7d',this)">7 dias</button>
+            <button class="ptab desktop-period" onclick="setPeriod('30d',this)">30 dias</button>
+            <button class="ptab desktop-period" onclick="setPeriod('90d',this)">90 dias</button>
+          </div>
         </div>
-      </div>
-      <div class="sidebar-divider"></div>
-      <div style="display:flex;flex-direction:column;gap:8px">
-        <div class="sidebar-title">Filtros</div>
-        <input class="filter-input" type="text" id="filter-name-desk" placeholder="🔍 Buscar campanha..." oninput="syncFilter('name')"/>
-        <input class="filter-input" type="date" id="filter-start-desk" onchange="syncFilter('start')" placeholder="Data início"/>
-        <input class="filter-input" type="date" id="filter-end-desk" onchange="syncFilter('end')"/>
-        <button class="filter-clear" id="filter-clear-desk" onclick="clearFilter()" style="display:none">✕ Limpar filtro</button>
-      </div>
-      <div class="sidebar-divider"></div>
-      <div>
-        <div class="sidebar-title">Campanhas</div>
-        <div style="display:flex;flex-direction:column;gap:6px;margin-top:0.25rem">
-          <div id="sb-btn-ativas" style="padding:8px 12px;border-radius:10px;font-size:12px;font-weight:600;text-align:center;cursor:pointer;background:#34D399;border:2px solid #34D399;color:#000" onclick="setCampFilter(true)">● Apenas ativas</div>
-          <div id="sb-btn-todas" style="padding:8px 12px;border-radius:10px;font-size:12px;font-weight:600;text-align:center;cursor:pointer;background:transparent;border:2px solid #333;color:#555" onclick="setCampFilter(false)">○ Todas</div>
+        <div class="sidebar-divider"></div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div class="sidebar-title">Filtros</div>
+          <input class="filter-input" type="text" id="filter-name-desk" placeholder="🔍 Buscar campanha..." oninput="syncFilter('name')"/>
+          <input class="filter-input" type="date" id="filter-start-desk" onchange="syncFilter('start')" placeholder="Data início"/>
+          <input class="filter-input" type="date" id="filter-end-desk" onchange="syncFilter('end')"/>
+          <button class="filter-clear" id="filter-clear-desk" onclick="clearFilter()" style="display:none">✕ Limpar filtro</button>
+        </div>
+        <div class="sidebar-divider"></div>
+        <div>
+          <div class="sidebar-title">Campanhas</div>
+          <div style="display:flex;flex-direction:column;gap:6px;margin-top:0.25rem">
+            <div id="sb-btn-ativas" style="padding:8px 12px;border-radius:10px;font-size:12px;font-weight:600;text-align:center;cursor:pointer;background:#34D399;border:2px solid #34D399;color:#000" onclick="setCampFilter(true)">● Apenas ativas</div>
+            <div id="sb-btn-todas" style="padding:8px 12px;border-radius:10px;font-size:12px;font-weight:600;text-align:center;cursor:pointer;background:transparent;border:2px solid #333;color:#555" onclick="setCampFilter(false)">○ Todas</div>
+          </div>
         </div>
       </div>
     </aside>
     <div class="dash-main">
+      <div class="view-tabs mobile-only">
+        <div class="view-tab active" id="view-tab-dash" onclick="showView('dash')">📊 Dashboard</div>
+        <div class="view-tab" id="view-tab-polo" onclick="showView('polo')">📍 Resumo por Polo</div>
+      </div>
+      <div id="view-dash">
       <div class="dash mobile-period-tabs">
     <div class="period-tabs mobile-only">
       <button class="ptab active" onclick="setPeriod('7d',this)">7 dias</button>
@@ -248,6 +275,24 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     <div class="filter-summary" id="filter-summary"></div>
     <div id="dash-content"><div class="loading"><span class="spinner"></span>Carregando métricas...</div></div>
 
+      </div>
+      </div>
+      <div id="view-polo" style="display:none">
+        <div class="dash">
+          <div class="client-name" id="polo-title">Resumo por Polo</div>
+          <div class="polo-filter">
+            <div class="polo-filter-field">
+              <div class="polo-label">Início</div>
+              <input class="filter-input" type="date" id="polo-start"/>
+            </div>
+            <div class="polo-filter-field">
+              <div class="polo-label">Fim</div>
+              <input class="filter-input" type="date" id="polo-end"/>
+            </div>
+            <button class="polo-btn" onclick="loadPoloSummary()">Buscar</button>
+          </div>
+          <div id="polo-content"><div class="loading"><span class="spinner"></span>Carregando resumo...</div></div>
+        </div>
       </div>
     </div>
   </div>
@@ -270,6 +315,73 @@ let rawMetrics = null;
 let onlyActive = true;
 let accountStatus = 1;
 
+const POLOS_CONFIG = {
+  '44444444-4444-4444-4444-444444444444': { // Uningá - act_466229668843496
+    nome: 'Uningá',
+    polos: [
+      { nome: 'Toledo', termos: ['toledo'] },
+      { nome: 'São José do Rio Preto', termos: ['sjrp', 'rio preto'] },
+      { nome: 'Santa Helena', termos: ['sh', 'santa helena'] },
+      { nome: 'Marechal Cândido Rondon', termos: ['mcr', 'marechal rondon'] },
+      { nome: 'Missal', termos: ['missal'] },
+      { nome: 'Birigui', termos: ['birigui', 'birigüi'] },
+      { nome: 'Araçatuba', termos: ['araçatuba', 'aracatuba'] },
+      { nome: 'Itaipulândia', termos: ['itaipulandia', 'itaipulândia'] },
+      { nome: 'Marília', termos: ['marilia', 'marília'] },
+      { nome: 'Mirassol', termos: ['mirassol'] },
+    ]
+  },
+  '55555555-5555-5555-5555-555555555555': { // Mestra-EAD-Uningá - act_725071917282682
+    nome: 'Mestra-EAD',
+    polos: [
+      { nome: 'Abelardo Luz', termos: ['abelardo', 'aberlado'] },
+      { nome: 'Ampere', termos: ['ampere', 'ampére'] },
+      { nome: 'Assis', termos: ['assis'] },
+      { nome: 'Barracão', termos: ['barracão', 'barracao'] },
+      { nome: 'Cafelândia', termos: ['cafelândia', 'cafelandia'] },
+      { nome: 'Campina da Lagoa', termos: ['campina'] },
+      { nome: 'Capanema', termos: ['capanema'] },
+      { nome: 'Capitão', termos: ['capitão', 'capitao'] },
+      { nome: 'Cascavel', termos: ['cascavel'] },
+      { nome: 'Céu Azul', termos: ['céu azul', 'ceu azul'] },
+      { nome: 'Chopinzinho', termos: ['chopinzinho'] },
+      { nome: 'Clevelândia', termos: ['clevelândia', 'clevelandia'] },
+      { nome: 'Coronel Vivida', termos: ['vivida'] },
+      { nome: 'Dois Vizinhos', termos: ['dois vizinhos'] },
+      { nome: 'Foz do Iguaçu', termos: ['foz'] },
+      { nome: 'Francisco Beltrão', termos: ['beltrão', 'beltrao'] },
+      { nome: 'General Carneiro', termos: ['carneiro'] },
+      { nome: 'Guaraniaçu', termos: ['guaraniaçu', 'guaraniacu'] },
+      { nome: 'Itapejara do Oeste', termos: ['itapejara'] },
+      { nome: 'Laranjeiras do Sul', termos: ['laranjeiras'] },
+      { nome: 'Mamborê', termos: ['mamborê', 'mambore'] },
+      { nome: 'Mangueirinha', termos: ['mangueirinha'] },
+      { nome: 'Marmeleiro', termos: ['marmeleiro'] },
+      { nome: 'Matelândia', termos: ['matelândia', 'matelandia'] },
+      { nome: 'Medianeira', termos: ['medianeira'] },
+      { nome: 'Nova Aurora', termos: ['nova aurora'] },
+      { nome: 'Palmas', termos: ['palmas'] },
+      { nome: 'Palotina', termos: ['palotina'] },
+      { nome: 'Pato Branco', termos: ['pato branco'] },
+      { nome: 'Quedas do Iguaçu', termos: ['quedas'] },
+      { nome: 'Realeza', termos: ['realeza'] },
+      { nome: 'Salto do Lontra', termos: ['lontra'] },
+      { nome: 'Santa Tereza do Oeste', termos: ['santa tereza'] },
+      { nome: 'São João', termos: ['são joão', 'sao joao'] },
+      { nome: 'São Lourenço do Oeste', termos: ['lourenço', 'lourenco'] },
+      { nome: 'São Miguel do Iguaçu', termos: ['são miguel', 'sao miguel'] },
+      { nome: 'Santo Antônio do Sudoeste', termos: ['sudoeste', 'sto antonio'] },
+      { nome: 'Terra Roxa', termos: ['terra roxa'] },
+      { nome: 'Três Barras', termos: ['três barras', 'tres barras'] },
+      { nome: 'Ubiratã', termos: ['ubiratã', 'ubirata'] },
+    ]
+  }
+};
+let poloAccountUuid = null;
+let poloCampaigns = null;
+let poloLoadedForClient = null;
+let lastPoloRows = null;
+
 async function doLogin() {
   const email = document.getElementById('login-email').value.trim();
   if (!email) return;
@@ -284,7 +396,17 @@ async function doLogin() {
   document.getElementById('screen-login').classList.remove('active');
   document.getElementById('screen-dash').classList.add('active');
   sessionStorage.setItem('metadash_email', email);
+  togglePoloMenu();
   loadDash();
+}
+
+function togglePoloMenu() {
+  const hasPolos = currentClient && !!POLOS_CONFIG[currentClient.id];
+  const navPolo = document.getElementById('nav-polo');
+  const tabPolo = document.getElementById('view-tab-polo');
+  if (navPolo) navPolo.style.display = hasPolos ? '' : 'none';
+  if (tabPolo) tabPolo.style.display = hasPolos ? '' : 'none';
+  if (!hasPolos) showView('dash');
 }
 
 async function loadDash() {
@@ -614,6 +736,183 @@ function fmtObjective(o) {
   return map[o] || o || 'Campanha';
 }
 
+function showView(view) {
+  const isPolo = view === 'polo';
+  document.getElementById('view-dash').style.display = isPolo ? 'none' : '';
+  document.getElementById('view-polo').style.display = isPolo ? '' : 'none';
+  const sidebarExtra = document.getElementById('sidebar-dash-only');
+  if (sidebarExtra) sidebarExtra.style.display = isPolo ? 'none' : '';
+  const navDash = document.getElementById('nav-dash');
+  const navPolo = document.getElementById('nav-polo');
+  if (navDash) navDash.classList.toggle('active', !isPolo);
+  if (navPolo) navPolo.classList.toggle('active', isPolo);
+  const tabDash = document.getElementById('view-tab-dash');
+  const tabPolo = document.getElementById('view-tab-polo');
+  if (tabDash) tabDash.classList.toggle('active', !isPolo);
+  if (tabPolo) tabPolo.classList.toggle('active', isPolo);
+
+  if (isPolo && currentClient && poloLoadedForClient !== currentClient.id) {
+    poloLoadedForClient = currentClient.id;
+    const config = POLOS_CONFIG[currentClient.id];
+    const title = document.getElementById('polo-title');
+    if (title && config) title.textContent = `Resumo por Polo — ${config.nome}`;
+    const end = new Date();
+    const start = new Date();
+    start.setDate(start.getDate() - 30);
+    document.getElementById('polo-end').value = end.toISOString().split('T')[0];
+    document.getElementById('polo-start').value = start.toISOString().split('T')[0];
+    loadPoloSummary();
+  }
+}
+
+function normalizeStr(s) {
+  return (s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+}
+
+function matchPolo(campaignName, polos) {
+  const norm = normalizeStr(campaignName);
+  return polos.find(p => p.termos.some(t => norm.includes(normalizeStr(t))));
+}
+
+async function ensurePoloAccount() {
+  if (poloAccountUuid) return poloAccountUuid;
+  const res = await fetch(`${API}/accounts/${currentClient.id}`);
+  const accounts = await res.json();
+  const acc = accounts[0];
+  if (!acc) throw new Error('Conta não encontrada');
+  poloAccountUuid = acc.id;
+  return poloAccountUuid;
+}
+
+async function ensurePoloCampaigns() {
+  if (poloCampaigns) return poloCampaigns;
+  const accUuid = await ensurePoloAccount();
+  const res = await fetch(`${API}/campaigns/${accUuid}`);
+  poloCampaigns = await res.json();
+  return poloCampaigns;
+}
+
+async function loadPoloSummary() {
+  const config = POLOS_CONFIG[currentClient.id];
+  const since = document.getElementById('polo-start').value;
+  const until = document.getElementById('polo-end').value;
+  const content = document.getElementById('polo-content');
+  if (!config) return;
+  if (!since || !until) {
+    content.innerHTML = '<div class="loading">Selecione a data de início e fim.</div>';
+    return;
+  }
+  const diffDays = (new Date(until) - new Date(since)) / (1000 * 60 * 60 * 24);
+  if (diffDays < 0) {
+    content.innerHTML = '<div class="loading">⚠️ Data de início deve ser anterior à data de fim.</div>';
+    return;
+  }
+  if (diffDays > 90) {
+    content.innerHTML = '<div class="loading">⚠️ Período máximo de 90 dias</div>';
+    return;
+  }
+
+  content.innerHTML = '<div class="loading"><span class="spinner"></span>Carregando resumo...</div>';
+  try {
+    const accUuid = await ensurePoloAccount();
+    const campaigns = await ensurePoloCampaigns();
+
+    const poloMap = {};
+    config.polos.forEach(p => poloMap[p.nome] = []);
+    const outrosIds = [];
+    campaigns.forEach(c => {
+      const match = matchPolo(c.name, config.polos);
+      if (match) poloMap[match.nome].push(c.id);
+      else outrosIds.push(c.id);
+    });
+
+    const allIds = Object.values(poloMap).flat().concat(outrosIds);
+    if (!allIds.length) {
+      content.innerHTML = '<div class="loading">Nenhuma campanha encontrada nesta conta.</div>';
+      return;
+    }
+
+    const chunkSize = 50;
+    const chunks = [];
+    for (let i = 0; i < allIds.length; i += chunkSize) chunks.push(allIds.slice(i, i + chunkSize));
+
+    const spendByCampaign = {};
+    for (let i = 0; i < chunks.length; i++) {
+      if (chunks.length > 1) {
+        content.innerHTML = `<div class="loading"><span class="spinner"></span>Buscando métricas... (lote ${i + 1} de ${chunks.length})</div>`;
+      }
+      const metRes = await fetch(`${API}/metrics-campaigns-date`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ campaignIds: chunks[i], accountId: accUuid, since, until }),
+      });
+      const data = await metRes.json();
+      if (data.error) { content.innerHTML = '<div class="loading">Erro ao carregar métricas dos polos.</div>'; return; }
+      (data.results || []).forEach(r => spendByCampaign[r.campaignId] = r.spend || 0);
+    }
+
+    const rows = config.polos.map(p => ({
+      nome: p.nome,
+      spend: poloMap[p.nome].reduce((sum, id) => sum + (spendByCampaign[id] || 0), 0),
+    }));
+    const outrosSpend = outrosIds.reduce((sum, id) => sum + (spendByCampaign[id] || 0), 0);
+    if (outrosIds.length) rows.push({ nome: 'Outros', spend: outrosSpend });
+
+    rows.sort((a, b) => b.spend - a.spend);
+    renderPoloSummary(rows);
+  } catch (err) {
+    content.innerHTML = '<div class="loading">Erro ao carregar resumo por polo.</div>';
+  }
+}
+
+function renderPoloSummary(rows) {
+  const total = rows.reduce((a, r) => a + r.spend, 0);
+  const fmt = v => v.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const pct = v => total > 0 ? ((v / total) * 100).toFixed(1) + '%' : '0%';
+
+  lastPoloRows = rows;
+
+  const rowsHtml = rows.map(r => `<tr><td>${r.nome}</td><td style="text-align:right">R$ ${fmt(r.spend)}</td><td style="text-align:right">${pct(r.spend)}</td></tr>`).join('');
+  const cardsHtml = rows.map(r => `
+    <div class="polo-card"><div class="polo-card-name">${r.nome}</div><div style="text-align:right"><div class="polo-card-spend">R$ ${fmt(r.spend)}</div><div style="font-size:11px;color:var(--text3)">${pct(r.spend)}</div></div></div>
+  `).join('');
+
+  document.getElementById('polo-content').innerHTML = `
+    <div style="padding:0 1.25rem;margin-bottom:0.75rem;display:flex;justify-content:flex-end">
+      <button class="filter-clear" style="display:block;width:auto;color:var(--text2);border-color:var(--border2)" onclick="exportPoloCsv()">⬇ Exportar CSV</button>
+    </div>
+    <div class="polo-table-wrap desktop-only">
+      <table class="polo-table">
+        <thead><tr><th>Polo</th><th style="text-align:right">Gasto no período</th><th style="text-align:right">% do Total</th></tr></thead>
+        <tbody>${rowsHtml}</tbody>
+        <tfoot><tr><td>Total</td><td style="text-align:right">R$ ${fmt(total)}</td><td style="text-align:right">100%</td></tr></tfoot>
+      </table>
+    </div>
+    <div class="mobile-only">
+      <div class="polo-cards">${cardsHtml}</div>
+      <div class="polo-total-card"><div class="polo-card-name">Total</div><div class="polo-card-spend">R$ ${fmt(total)}</div></div>
+    </div>
+  `;
+}
+
+function exportPoloCsv() {
+  if (!lastPoloRows) return;
+  const total = lastPoloRows.reduce((a, r) => a + r.spend, 0);
+  const lines = [['Polo', 'Gasto', '% do Total'].join(';')];
+  lastPoloRows.forEach(r => {
+    const pct = total > 0 ? ((r.spend / total) * 100).toFixed(1) : '0';
+    lines.push([r.nome, r.spend.toFixed(2).replace('.', ','), pct.replace('.', ',') + '%'].join(';'));
+  });
+  lines.push(['Total', total.toFixed(2).replace('.', ','), '100%'].join(';'));
+  const blob = new Blob(['﻿' + lines.join('\n')], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `resumo-por-polo-${document.getElementById('polo-start').value}-a-${document.getElementById('polo-end').value}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
 function setPeriod(p, el) {
   currentPeriod = p;
   document.querySelectorAll('.ptab').forEach(t => t.classList.remove('active'));
@@ -671,9 +970,13 @@ document.addEventListener('click', function(e) {
 function doLogout() {
   currentClient = null;
   rawMetrics = null;
+  poloLoadedForClient = null;
+  poloAccountUuid = null;
+  poloCampaigns = null;
+  lastPoloRows = null;
   sessionStorage.removeItem('metadash_email');
   document.getElementById('screen-dash').classList.remove('active');
-
+  showView('dash');
   document.getElementById('screen-login').classList.add('active');
   document.getElementById('login-email').value = '';
   document.getElementById('avatar-menu').classList.remove('open');
