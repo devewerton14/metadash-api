@@ -772,11 +772,11 @@ async function openCampaign(campId, campName) {
       { label:'Gasto total', value: fmtMoneyOrDash(m.spend) },
     ];
   } else if (category === 'traffic') {
-    const seguidores = (m.actions||[]).find(a => a.action_type === 'follow');
-    const seguidoresValue = seguidores ? fmtNumOrDash(parseInt(seguidores.value)) : '—';
+    const engajamento = (m.actions||[]).find(a => a.action_type === 'page_engagement');
+    const engajamentoValue = engajamento ? fmtNumOrDash(parseInt(engajamento.value)) : '—';
     featured = [
       { icon:'👆', label:'Visitas ao perfil', value: fmtNumOrDash(m.linkClicks) },
-      { icon:'👥', label:'Novos seguidores', value: seguidoresValue },
+      { icon:'❤️', label:'Engajamento total', value: engajamentoValue },
       { icon:'💵', label:'CPC', value: fmtMoneyOrDash(cpc) },
       { icon:'📈', label:'CTR', value: fmtPctOrDash(m.ctr) },
     ];
