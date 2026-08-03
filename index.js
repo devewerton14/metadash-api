@@ -202,6 +202,7 @@ app.get('/campaign/:campaignId', async (req, res) => {
       landingPageViews: getAction('landing_page_view'),
       instagramProfileVisits: getAction('instagram_profile_visit'),
       pageLikes: getAction('like'),
+      follow: getAction('follow'),
       actions,
     });
   } catch (err) {

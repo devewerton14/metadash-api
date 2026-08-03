@@ -772,13 +772,11 @@ async function openCampaign(campId, campName) {
       { label:'Gasto total', value: fmtMoneyOrDash(m.spend) },
     ];
   } else if (category === 'traffic') {
-    const profileVisitAction = (m.actions||[]).find(a => a.action_type === 'instagram_profile_visit');
-    const linkClickAction = (m.actions||[]).find(a => a.action_type === 'link_click');
-    const visitasValue = profileVisitAction ? parseInt(profileVisitAction.value) : (linkClickAction ? parseInt(linkClickAction.value) : 0);
-    const visitasLabel = profileVisitAction ? 'Visitas ao perfil' : 'Cliques no link';
+    const seguidores = (m.actions||[]).find(a => a.action_type === 'follow');
+    const seguidoresValue = seguidores ? fmtNumOrDash(parseInt(seguidores.value)) : '—';
     featured = [
-      { icon:'👆', label: visitasLabel, value: fmtNumOrDash(visitasValue) },
-      { icon:'🖱️', label:'Cliques no link', value: fmtNumOrDash(m.linkClicks) },
+      { icon:'👆', label:'Visitas ao perfil', value: fmtNumOrDash(m.linkClicks) },
+      { icon:'👥', label:'Novos seguidores', value: seguidoresValue },
       { icon:'💵', label:'CPC', value: fmtMoneyOrDash(cpc) },
       { icon:'📈', label:'CTR', value: fmtPctOrDash(m.ctr) },
     ];
