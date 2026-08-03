@@ -29,6 +29,86 @@ app.get('/accounts/:clientId', async (req, res) => {
   res.json(data);
 });
 
+async function getAccountMetrics(accountId, sinceStr, untilStr) {
+  const { data: account } = await supabase
+    .from('ad_accounts').select('*')
+    .eq('id', accountId).single();
+
+  // Métricas gerais
+  const metaRes = await axios.get(
+    `https://graph.facebook.com/v19.0/${account.account_id}/insights`,
+    { params: {
+      access_token: account.access_token,
+      time_range: JSON.stringify({ since: sinceStr, until: untilStr }),
+      fields: 'impressions,clicks,spend,reach,ctr,cpm,actions',
+      level: 'account',
+    }}
+  );
+
+  const raw = metaRes.data.data[0] || {};
+  const actions = raw.actions || [];
+  const conversions = actions.find(a => a.action_type === 'purchase' || a.action_type === 'lead');
+  const conversations = actions.find(a =>
+    a.action_type === 'onsite_conversion.messaging_conversation_started_7d' ||
+    a.action_type === 'onsite_conversion.total_messaging_connection' ||
+    a.action_type === 'onsite_conversion.messaging_first_reply'
+  );
+
+  // Gasto diário
+  const dailyRes = await axios.get(
+    `https://graph.facebook.com/v19.0/${account.account_id}/insights`,
+    { params: {
+      access_token: account.access_token,
+      time_range: JSON.stringify({ since: sinceStr, until: untilStr }),
+      fields: 'spend,impressions,clicks',
+      time_increment: 1,
+      level: 'account',
+    }}
+  );
+  const daily = (dailyRes.data.data || []).map(d => ({
+    date: d.date_start,
+    spend: parseFloat(d.spend || 0),
+    impressions: parseInt(d.impressions || 0),
+    clicks: parseInt(d.clicks || 0),
+  }));
+
+  // Campanhas ativas
+  const campRes = await axios.get(
+    `https://graph.facebook.com/v19.0/${account.account_id}/campaigns`,
+    { params: {
+      access_token: account.access_token,
+      fields: 'id,name,status,effective_status,objective,stop_time',
+      effective_status: ['ACTIVE','PAUSED','ARCHIVED','WITH_ISSUES','CAMPAIGN_PAUSED'],
+      limit: account.account_id === 'act_725071917282682' ? 200 : 20,
+    }}
+  );
+  const campaigns = campRes.data.data || [];
+
+  // Busca status da conta
+  const statusRes = await axios.get(
+    `https://graph.facebook.com/v19.0/${account.account_id}`,
+    { params: { access_token: account.access_token, fields: 'account_status,disable_reason' }}
+  ).catch(() => ({ data: { account_status: 1 } }));
+
+  const accountStatus = statusRes.data.account_status;
+  const disableReason = statusRes.data.disable_reason || 0;
+
+  return {
+    accountStatus,
+    disableReason,
+    spend: parseFloat(raw.spend || 0).toFixed(2),
+    impressions: parseInt(raw.impressions || 0),
+    clicks: parseInt(raw.clicks || 0),
+    reach: parseInt(raw.reach || 0),
+    ctr: parseFloat(raw.ctr || 0).toFixed(2),
+    cpm: parseFloat(raw.cpm || 0).toFixed(2),
+    conversions: conversions ? parseInt(conversions.value) : 0,
+    conversations: conversations ? parseInt(conversations.value) : 0,
+    daily,
+    campaigns,
+  };
+}
+
 app.get('/metrics/:accountId', async (req, res) => {
   const period = req.query.period || '30d';
   const periodMap = { '7d': 7, '30d': 30, '90d': 90 };
@@ -39,86 +119,23 @@ app.get('/metrics/:accountId', async (req, res) => {
   const nowStr = new Date().toISOString().split('T')[0];
 
   try {
-    const { data: account } = await supabase
-      .from('ad_accounts').select('*')
-      .eq('id', req.params.accountId).single();
+    const data = await getAccountMetrics(req.params.accountId, sinceStr, nowStr);
+    res.json(data);
+  } catch (err) {
+    console.error(JSON.stringify(err?.response?.data || err.message));
+    res.status(500).json({ error: 'Erro ao buscar métricas na Meta', detail: err?.response?.data || err.message });
+  }
+});
 
-    // Métricas gerais
-    const metaRes = await axios.get(
-      `https://graph.facebook.com/v19.0/${account.account_id}/insights`,
-      { params: {
-        access_token: account.access_token,
-        time_range: JSON.stringify({ since: sinceStr, until: nowStr }),
-        fields: 'impressions,clicks,spend,reach,ctr,cpm,actions',
-        level: 'account',
-      }}
-    );
-
-    const raw = metaRes.data.data[0] || {};
-    const actions = raw.actions || [];
-    const conversions = actions.find(a => a.action_type === 'purchase' || a.action_type === 'lead');
-    const conversations = actions.find(a => 
-      a.action_type === 'onsite_conversion.messaging_conversation_started_7d' ||
-      a.action_type === 'onsite_conversion.total_messaging_connection' ||
-      a.action_type === 'onsite_conversion.messaging_first_reply'
-    );
-
-    // Gasto diário
-    const dailyRes = await axios.get(
-      `https://graph.facebook.com/v19.0/${account.account_id}/insights`,
-      { params: {
-        access_token: account.access_token,
-        time_range: JSON.stringify({ since: sinceStr, until: nowStr }),
-        fields: 'spend,impressions,clicks',
-        time_increment: 1,
-        level: 'account',
-      }}
-    );
-    const daily = (dailyRes.data.data || []).map(d => ({
-      date: d.date_start,
-      spend: parseFloat(d.spend || 0),
-      impressions: parseInt(d.impressions || 0),
-      clicks: parseInt(d.clicks || 0),
-    }));
-
-    // Campanhas ativas
-    const campRes = await axios.get(
-      `https://graph.facebook.com/v19.0/${account.account_id}/campaigns`,
-      { params: {
-        access_token: account.access_token,
-        fields: 'id,name,status,effective_status,objective,stop_time',
-
-
-        effective_status: ['ACTIVE','PAUSED','ARCHIVED','WITH_ISSUES','CAMPAIGN_PAUSED'],
-        limit: account.account_id === 'act_725071917282682' ? 200 : 20,
-        limit: account.account_id === 'act_725071917282682' ? 200 : 20,
-      }}
-    );
-    const campaigns = campRes.data.data || [];
-
-    // Busca status da conta
-    const statusRes = await axios.get(
-      `https://graph.facebook.com/v19.0/${account.account_id}`,
-      { params: { access_token: account.access_token, fields: 'account_status,disable_reason' }}
-    ).catch(() => ({ data: { account_status: 1 } }));
-
-    const accountStatus = statusRes.data.account_status;
-    const disableReason = statusRes.data.disable_reason || 0;
-
-    res.json({
-      accountStatus,
-      disableReason,
-      spend: parseFloat(raw.spend || 0).toFixed(2),
-      impressions: parseInt(raw.impressions || 0),
-      clicks: parseInt(raw.clicks || 0),
-      reach: parseInt(raw.reach || 0),
-      ctr: parseFloat(raw.ctr || 0).toFixed(2),
-      cpm: parseFloat(raw.cpm || 0).toFixed(2),
-      conversions: conversions ? parseInt(conversions.value) : 0,
-      conversations: conversations ? parseInt(conversations.value) : 0,
-      daily,
-      campaigns,
-    });
+// Métricas de uma conta em um intervalo de datas específico (since/until)
+app.get('/metrics-by-date/:accountId', async (req, res) => {
+  const { since, until } = req.query;
+  if (!since || !until) {
+    return res.status(400).json({ error: 'Parâmetros since e until (YYYY-MM-DD) são obrigatórios' });
+  }
+  try {
+    const data = await getAccountMetrics(req.params.accountId, since, until);
+    res.json(data);
   } catch (err) {
     console.error(JSON.stringify(err?.response?.data || err.message));
     res.status(500).json({ error: 'Erro ao buscar métricas na Meta', detail: err?.response?.data || err.message });
@@ -127,13 +144,17 @@ app.get('/metrics/:accountId', async (req, res) => {
 
 // Métricas de uma campanha específica
 app.get('/campaign/:campaignId', async (req, res) => {
-  const { accountId, period } = req.query;
-  const periodMap = { '7d': 7, '30d': 30, '90d': 90 };
-  const days = periodMap[period] || 30;
-  const since = new Date();
-  since.setDate(since.getDate() - days);
-  const sinceStr = since.toISOString().split('T')[0];
-  const nowStr = new Date().toISOString().split('T')[0];
+  const { accountId, period, since, until } = req.query;
+  let sinceStr = since;
+  let nowStr = until;
+  if (!sinceStr || !nowStr) {
+    const periodMap = { '7d': 7, '30d': 30, '90d': 90 };
+    const days = periodMap[period] || 30;
+    const sinceDate = new Date();
+    sinceDate.setDate(sinceDate.getDate() - days);
+    sinceStr = sinceDate.toISOString().split('T')[0];
+    nowStr = new Date().toISOString().split('T')[0];
+  }
 
   try {
     const { data: account } = await supabase

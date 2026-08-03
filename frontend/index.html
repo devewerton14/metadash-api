@@ -95,6 +95,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .avatar-menu-item:hover{background:#1E1E2E}
 .dash{max-width:420px;margin:0 auto;padding-bottom:2rem}
 .period-tabs{padding:0.75rem 1.25rem;display:flex;gap:4px}
+.ptab-5col{flex-wrap:wrap;row-gap:6px}
+.ptab-5col .ptab{flex:1 1 30%;min-width:0}
 .ptab{flex:1;text-align:center;padding:6px 0;font-size:12px;font-weight:500;border-radius:8px;cursor:pointer;color:var(--text3);transition:all 0.15s;border:none;background:none}
 .ptab.active{background:var(--bg2);color:var(--text)}
 .filter-bar{padding:0 1.25rem;margin-bottom:0.75rem;display:flex;flex-direction:column;gap:8px}
@@ -229,17 +231,19 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
         <div>
           <div class="sidebar-title">Período</div>
           <div class="period-tabs" style="flex-direction:column;gap:4px;padding:0">
-            <button class="ptab desktop-period active" onclick="setPeriod('7d',this)">7 dias</button>
-            <button class="ptab desktop-period" onclick="setPeriod('30d',this)">30 dias</button>
-            <button class="ptab desktop-period" onclick="setPeriod('90d',this)">90 dias</button>
+            <button class="ptab desktop-period" data-preset="hoje" onclick="setPeriodPreset('hoje',this)">Hoje</button>
+            <button class="ptab desktop-period" data-preset="ontem" onclick="setPeriodPreset('ontem',this)">Ontem</button>
+            <button class="ptab desktop-period active" data-preset="7d" onclick="setPeriodPreset('7d',this)">7 dias</button>
+            <button class="ptab desktop-period" data-preset="15d" onclick="setPeriodPreset('15d',this)">15 dias</button>
+            <button class="ptab desktop-period" data-preset="30d" onclick="setPeriodPreset('30d',this)">30 dias</button>
           </div>
         </div>
         <div class="sidebar-divider"></div>
         <div style="display:flex;flex-direction:column;gap:8px">
           <div class="sidebar-title">Filtros</div>
-          <input class="filter-input" type="text" id="filter-name-desk" placeholder="🔍 Buscar campanha..." oninput="syncFilter('name')"/>
-          <input class="filter-input" type="date" id="filter-start-desk" onchange="syncFilter('start')" placeholder="Data início"/>
-          <input class="filter-input" type="date" id="filter-end-desk" onchange="syncFilter('end')"/>
+          <input class="filter-input" type="text" id="filter-name-desk" placeholder="🔍 Buscar campanha..." oninput="syncNameFilter()"/>
+          <input class="filter-input" type="date" id="filter-start-desk" onchange="handleDateChange('start',this.value)" placeholder="Data início"/>
+          <input class="filter-input" type="date" id="filter-end-desk" onchange="handleDateChange('end',this.value)"/>
           <button class="filter-clear" id="filter-clear-desk" onclick="clearFilter()" style="display:none">✕ Limpar filtro</button>
         </div>
         <div class="sidebar-divider"></div>
@@ -259,16 +263,18 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
       </div>
       <div id="view-dash">
       <div class="dash mobile-period-tabs">
-    <div class="period-tabs mobile-only">
-      <button class="ptab active" onclick="setPeriod('7d',this)">7 dias</button>
-      <button class="ptab" onclick="setPeriod('30d',this)">30 dias</button>
-      <button class="ptab" onclick="setPeriod('90d',this)">90 dias</button>
+    <div class="period-tabs mobile-only ptab-5col">
+      <button class="ptab" data-preset="hoje" onclick="setPeriodPreset('hoje',this)">Hoje</button>
+      <button class="ptab" data-preset="ontem" onclick="setPeriodPreset('ontem',this)">Ontem</button>
+      <button class="ptab active" data-preset="7d" onclick="setPeriodPreset('7d',this)">7 dias</button>
+      <button class="ptab" data-preset="15d" onclick="setPeriodPreset('15d',this)">15 dias</button>
+      <button class="ptab" data-preset="30d" onclick="setPeriodPreset('30d',this)">30 dias</button>
     </div>
     <div class="filter-bar">
-      <input class="filter-input" type="text" id="filter-name" placeholder="🔍 Buscar campanha..." oninput="applyFilter()"/>
+      <input class="filter-input" type="text" id="filter-name" placeholder="🔍 Buscar campanha..." oninput="handleNameInput()"/>
       <div class="filter-dates">
-        <input class="filter-input" type="date" id="filter-start" onchange="applyFilter()"/>
-        <input class="filter-input" type="date" id="filter-end" onchange="applyFilter()"/>
+        <input class="filter-input" type="date" id="filter-start" onchange="handleDateChange('start',this.value)"/>
+        <input class="filter-input" type="date" id="filter-end" onchange="handleDateChange('end',this.value)"/>
       </div>
       <button class="filter-clear" id="filter-clear" onclick="clearFilter()">✕ Limpar filtro</button>
     </div>
@@ -309,11 +315,15 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 <script>
 const API = 'https://api.gptriade.com.br';
 let currentClient = null;
-let currentPeriod = '7d';
 let currentAccountId = null;
 let rawMetrics = null;
 let onlyActive = true;
 let accountStatus = 1;
+let currentSince = null;
+let currentUntil = null;
+let currentRangeLabel = 'Últimos 7 dias';
+let activePeriodPreset = '7d';
+let dateRangeMessageActive = false;
 
 const POLOS_CONFIG = {
   '44444444-4444-4444-4444-444444444444': { // Uningá - act_466229668843496
@@ -409,14 +419,114 @@ function togglePoloMenu() {
   if (!hasPolos) showView('dash');
 }
 
+function pad2(n) { return n < 10 ? '0'+n : ''+n; }
+
+function toDateStr(d) {
+  return `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;
+}
+
+function fmtDateBR(dateStr) {
+  const [y,m,d] = dateStr.split('-');
+  return `${d}/${m}`;
+}
+
+function computePresetRange(preset) {
+  const today = new Date();
+  const yesterday = new Date(today);
+  yesterday.setDate(yesterday.getDate()-1);
+  if (preset === 'hoje') return { since: toDateStr(today), until: toDateStr(today) };
+  if (preset === 'ontem') return { since: toDateStr(yesterday), until: toDateStr(yesterday) };
+  const daysMap = { '7d':7, '15d':15, '30d':30 };
+  const start = new Date(today);
+  start.setDate(start.getDate() - (daysMap[preset]||7));
+  return { since: toDateStr(start), until: toDateStr(yesterday) };
+}
+
+function presetLabel(preset) {
+  const map = { hoje:'Hoje', ontem:'Ontem', '7d':'Últimos 7 dias', '15d':'Últimos 15 dias', '30d':'Últimos 30 dias' };
+  return map[preset] || '';
+}
+
+function setDateInputs(since, until) {
+  ['filter-start','filter-start-desk'].forEach(id => { const el = document.getElementById(id); if (el) el.value = since; });
+  ['filter-end','filter-end-desk'].forEach(id => { const el = document.getElementById(id); if (el) el.value = until; });
+}
+
+function highlightPeriodButtons(preset) {
+  document.querySelectorAll('.ptab').forEach(t => t.classList.remove('active'));
+  if (preset) document.querySelectorAll(`.ptab[data-preset="${preset}"]`).forEach(t => t.classList.add('active'));
+}
+
+function setPeriodPreset(preset) {
+  const range = computePresetRange(preset);
+  activePeriodPreset = preset;
+  setDateInputs(range.since, range.until);
+  highlightPeriodButtons(preset);
+  hideRangeMessage();
+  fetchAndRenderMetrics(range.since, range.until, presetLabel(preset));
+}
+
+function showRangeMessage(text, isError) {
+  dateRangeMessageActive = true;
+  const s = document.getElementById('filter-summary');
+  if (!s) return;
+  s.style.display = 'block';
+  s.style.color = isError ? '#F87171' : '#FACC15';
+  s.textContent = text;
+}
+
+function hideRangeMessage() {
+  dateRangeMessageActive = false;
+  const s = document.getElementById('filter-summary');
+  if (s) s.style.display = 'none';
+}
+
+function handleDateChange(which, value) {
+  const startEls = [document.getElementById('filter-start'), document.getElementById('filter-start-desk')];
+  const endEls = [document.getElementById('filter-end'), document.getElementById('filter-end-desk')];
+  (which === 'start' ? startEls : endEls).forEach(el => { if (el) el.value = value; });
+
+  activePeriodPreset = null;
+  highlightPeriodButtons(null);
+
+  const start = document.getElementById('filter-start').value;
+  const end = document.getElementById('filter-end').value;
+  if (!start || !end) return;
+
+  if (new Date(end) < new Date(start)) {
+    showRangeMessage('⚠️ A data final não pode ser anterior à data inicial', true);
+    return;
+  }
+  const diffDays = Math.round((new Date(end) - new Date(start)) / 86400000) + 1;
+  if (diffDays > 90) {
+    showRangeMessage('⚠️ Período maior que 90 dias selecionado — o carregamento pode ser mais lento', false);
+  } else {
+    hideRangeMessage();
+  }
+  fetchAndRenderMetrics(start, end, null);
+}
+
 async function loadDash() {
   document.getElementById('dash-content').innerHTML = '<div class="loading"><span class="spinner"></span>Carregando métricas...</div>';
   const accRes = await fetch(`${API}/accounts/${currentClient.id}`);
   const accounts = await accRes.json();
   if (!accounts.length) { document.getElementById('dash-content').innerHTML = '<div class="loading">Nenhuma conta encontrada.</div>'; return; }
-  const acc = accounts[0];
-  currentAccountId = acc.id;
-  const metRes = await fetch(`${API}/metrics/${acc.id}?period=${currentPeriod}`);
+  currentAccountId = accounts[0].id;
+
+  activePeriodPreset = '7d';
+  const range = computePresetRange('7d');
+  setDateInputs(range.since, range.until);
+  highlightPeriodButtons('7d');
+  hideRangeMessage();
+  await fetchAndRenderMetrics(range.since, range.until, presetLabel('7d'));
+}
+
+async function fetchAndRenderMetrics(since, until, label) {
+  document.getElementById('dash-content').innerHTML = '<div class="loading"><span class="spinner"></span>Carregando métricas...</div>';
+  currentSince = since;
+  currentUntil = until;
+  currentRangeLabel = label || (since === until ? fmtDateBR(since) : `${fmtDateBR(since)} a ${fmtDateBR(until)}`);
+  const metRes = await fetch(`${API}/metrics-by-date/${currentAccountId}?since=${since}&until=${until}`);
   const m = await metRes.json();
   if (m.error) { document.getElementById('dash-content').innerHTML = '<div class="loading">Erro ao carregar métricas.</div>'; return; }
   rawMetrics = m;
@@ -428,10 +538,30 @@ async function loadDash() {
     const concluded = isActive && c.stop_time && new Date(c.stop_time) < new Date();
     return isActive && !concluded;
   });
-  renderDash(initialCamps, m.daily, parseFloat(m.spend), m.impressions, m.clicks, m.conversations, m.reach, m.ctr, m.cpm, false, m.accountStatus||1);
+  renderDash(initialCamps, m.daily, m, false);
 }
 
-function renderDash(campaigns, daily, spendVal, impressionsVal, clicksVal, conversationsVal, reachVal, ctrVal, cpmVal, isFiltered, accountStatus=1) {
+function buildCampsHtml(campaigns, isFiltered) {
+  return (campaigns||[]).map(c => `
+    <div class="camp-item" onclick="openCampaign('${c.id}','${c.name.replace(/'/g,"\\'").replace(/`/g,"'")}')">
+      <div class="camp-dot" style="background:${c.effective_status==='ACTIVE'?'#34D399':c.effective_status==='PAUSED'?'#FACC15':'#F87171'}"></div>
+      <div class="camp-info">
+        <div class="camp-name">${c.name}</div>
+        <div class="camp-type">${fmtObjective(c.objective)} · <span style="color:${c.effective_status==='ACTIVE'?'#34D399':c.effective_status==='PAUSED'?'#FACC15':'#F87171'};font-size:10px">${(c.effective_status==='ACTIVE'&&c.stop_time&&new Date(c.stop_time)<new Date())?'Concluída':c.effective_status==='ACTIVE'?'Ativa':c.effective_status==='PAUSED'?'Pausada':'Concluída'}</span></div>
+      </div>
+      <div class="camp-arrow">›</div>
+    </div>
+  `).join('') || `<div style="padding:1rem 1.25rem;font-size:13px;color:var(--text3)">${isFiltered?'Nenhuma campanha encontrada':'Nenhuma campanha ativa'}</div>`;
+}
+
+function renderDash(campaigns, daily, m, isFiltered) {
+  const spendVal = parseFloat(m.spend);
+  const impressionsVal = m.impressions;
+  const clicksVal = m.clicks;
+  const conversationsVal = m.conversations;
+  const reachVal = m.reach;
+  const cpmVal = m.cpm;
+  const accountStatus = m.accountStatus || 1;
   const cpc = clicksVal > 0 ? (spendVal/clicksVal).toFixed(2) : '0.00';
   const maxSpend = Math.max(...(daily||[]).map(d=>d.spend), 1);
   const minSpend = Math.min(...(daily||[]).map(d=>d.spend));
@@ -450,16 +580,7 @@ function renderDash(campaigns, daily, spendVal, impressionsVal, clicksVal, conve
 
   setTimeout(updateCampButtons, 0);
 
-  const campsHtml = (campaigns||[]).map(c => `
-    <div class="camp-item" onclick="openCampaign('${c.id}','${c.name.replace(/'/g,"\\'").replace(/`/g,"'")}')">
-      <div class="camp-dot" style="background:${c.effective_status==='ACTIVE'?'#34D399':c.effective_status==='PAUSED'?'#FACC15':'#F87171'}"></div>
-      <div class="camp-info">
-        <div class="camp-name">${c.name}</div>
-        <div class="camp-type">${fmtObjective(c.objective)} · <span style="color:${c.effective_status==='ACTIVE'?'#34D399':c.effective_status==='PAUSED'?'#FACC15':'#F87171'};font-size:10px">${(c.effective_status==='ACTIVE'&&c.stop_time&&new Date(c.stop_time)<new Date())?'Concluída':c.effective_status==='ACTIVE'?'Ativa':c.effective_status==='PAUSED'?'Pausada':'Concluída'}</span></div>
-      </div>
-      <div class="camp-arrow">›</div>
-    </div>
-  `).join('') || `<div style="padding:1rem 1.25rem;font-size:13px;color:var(--text3)">${isFiltered?'Nenhuma campanha encontrada':'Nenhuma campanha ativa'}</div>`;
+  const campsHtml = buildCampsHtml(campaigns, isFiltered);
 
   document.getElementById('dash-content').innerHTML = `
     <div class="client-name">${currentClient.name}</div>
@@ -474,7 +595,7 @@ function renderDash(campaigns, daily, spendVal, impressionsVal, clicksVal, conve
     <div class="hero">
       <div class="hero-label">Valor Gasto</div>
       <div class="hero-value"><span class="hero-currency">R$ </span>${spendVal.toLocaleString('pt-BR',{minimumFractionDigits:2})}</div>
-      <div class="delta">${isFiltered?'Período filtrado':'Últimos '+(currentPeriod==='7d'?'7':currentPeriod==='30d'?'30':'90')+' dias'}</div>
+      <div class="delta">${currentRangeLabel}</div>
     </div>
     <div class="section-title">Visão Geral</div>
     <div class="metrics-grid">
@@ -487,7 +608,7 @@ function renderDash(campaigns, daily, spendVal, impressionsVal, clicksVal, conve
     </div>
     <div class="section-title">Gasto Diário</div>
     <div class="chart-card">
-      <div class="chart-header"><div class="chart-title">Gasto por dia</div><div class="chart-meta">${isFiltered?'Período filtrado':'Últimos '+currentPeriod.replace('d','')+' dias'}</div></div>
+      <div class="chart-header"><div class="chart-title">Gasto por dia</div><div class="chart-meta">${currentRangeLabel}</div></div>
       <div style="display:flex;gap:8px;align-items:flex-end">
         <div style="display:flex;flex-direction:column;justify-content:space-between;height:92px;padding-bottom:16px;flex-shrink:0">
           <span style="font-size:9px;font-family:'DM Mono',monospace;color:var(--text3)">R$${maxVal}</span>
@@ -501,46 +622,30 @@ function renderDash(campaigns, daily, spendVal, impressionsVal, clicksVal, conve
     </div>
     <div class="section-title">Campanhas</div>
     <div style="display:flex;gap:8px;padding:0 1.25rem;margin-bottom:0.75rem"><div id="cb-ativas" style="flex:1;padding:9px 0;border-radius:10px;font-size:13px;font-weight:600;text-align:center;cursor:pointer" onclick="setCampFilter(true)">Ativas</div><div id="cb-todas" style="flex:1;padding:9px 0;border-radius:10px;font-size:13px;font-weight:600;text-align:center;cursor:pointer" onclick="setCampFilter(false)">Todas</div></div>
-    <div class="camp-list">${campsHtml}</div>
+    <div class="camp-list" id="camp-list">${campsHtml}</div>
   `;
 }
 
-function syncFilter(type) {
-  const desk = {
-    name: document.getElementById('filter-name-desk'),
-    start: document.getElementById('filter-start-desk'),
-    end: document.getElementById('filter-end-desk')
-  };
-  const mob = {
-    name: document.getElementById('filter-name'),
-    start: document.getElementById('filter-start'),
-    end: document.getElementById('filter-end')
-  };
-  if (desk[type] && mob[type]) mob[type].value = desk[type].value;
-  applyFilter();
-  const hasFilter = (mob.name&&mob.name.value)||(mob.start&&mob.start.value)||(mob.end&&mob.end.value);
+function handleNameInput() {
+  const name = document.getElementById('filter-name').value;
+  const nameDesk = document.getElementById('filter-name-desk');
+  if (nameDesk) nameDesk.value = name;
+  applyNameFilter();
+  const hasFilter = !!name;
+  document.getElementById('filter-clear').style.display = hasFilter ? 'block' : 'none';
   const clearDesk = document.getElementById('filter-clear-desk');
   if (clearDesk) clearDesk.style.display = hasFilter ? 'block' : 'none';
 }
 
-function applyFilter() {
+function syncNameFilter() {
+  const name = document.getElementById('filter-name-desk').value;
+  document.getElementById('filter-name').value = name;
+  handleNameInput();
+}
+
+function applyNameFilter() {
   if (!rawMetrics) return;
   const name = document.getElementById('filter-name').value.toLowerCase().trim();
-  const start = document.getElementById('filter-start').value;
-  const end = document.getElementById('filter-end').value;
-  const hasFilter = name || start || end;
-  document.getElementById('filter-clear').style.display = hasFilter ? 'block' : 'none';
-
-  if (start && end) {
-    const diff = (new Date(end) - new Date(start)) / (1000*60*60*24);
-    if (diff > 90) {
-      const s = document.getElementById('filter-summary');
-      s.style.display = 'block';
-      s.style.color = '#F87171';
-      s.textContent = '⚠️ Período máximo de 90 dias';
-      return;
-    }
-  }
 
   let camps = rawMetrics.campaigns || [];
   if (onlyActive) camps = camps.filter(c => {
@@ -550,43 +655,32 @@ function applyFilter() {
   });
   if (name) camps = camps.filter(c => c.name.toLowerCase().includes(name));
 
-  let daily = rawMetrics.daily || [];
-  if (start) daily = daily.filter(d => d.date >= start);
-  if (end) daily = daily.filter(d => d.date <= end);
+  const listEl = document.getElementById('camp-list');
+  if (listEl) listEl.innerHTML = buildCampsHtml(camps, !!name);
+  setTimeout(updateCampButtons, 0);
 
-  const spendVal = daily.length && hasFilter ? daily.reduce((a,d)=>a+d.spend,0) : parseFloat(rawMetrics.spend);
-  const impressionsVal = daily.length && hasFilter ? daily.reduce((a,d)=>a+d.impressions,0) : rawMetrics.impressions;
-  const clicksVal = daily.length && hasFilter ? daily.reduce((a,d)=>a+d.clicks,0) : rawMetrics.clicks;
-
-  const summary = document.getElementById('filter-summary');
-  if (hasFilter) {
-    summary.style.display = 'block';
-    summary.style.color = '#7B61FF';
-    const parts = [];
-    if (name) parts.push(`"${name}": ${camps.length} campanha(s)`);
-    if (start || end) parts.push('período filtrado');
-    summary.textContent = '✓ ' + parts.join(' · ');
-  } else {
-    summary.style.display = 'none';
+  if (!dateRangeMessageActive) {
+    const summary = document.getElementById('filter-summary');
+    if (name) {
+      summary.style.display = 'block';
+      summary.style.color = '#7B61FF';
+      summary.textContent = `✓ "${name}": ${camps.length} campanha(s)`;
+    } else {
+      summary.style.display = 'none';
+    }
   }
-
-  renderDash(camps, daily, spendVal, impressionsVal, clicksVal, rawMetrics.conversations, rawMetrics.reach, rawMetrics.ctr, rawMetrics.cpm, hasFilter, rawMetrics.accountStatus||1);
 }
 
 function clearFilter() {
   document.getElementById('filter-name').value = '';
-  document.getElementById('filter-start').value = '';
-  document.getElementById('filter-end').value = '';
+  const nameDesk = document.getElementById('filter-name-desk');
+  if (nameDesk) nameDesk.value = '';
   document.getElementById('filter-clear').style.display = 'none';
-  document.getElementById('filter-summary').style.display = 'none';
+  const clearDesk = document.getElementById('filter-clear-desk');
+  if (clearDesk) clearDesk.style.display = 'none';
+  if (!dateRangeMessageActive) document.getElementById('filter-summary').style.display = 'none';
   if (rawMetrics) {
-    let camps = rawMetrics.campaigns || [];
-    if (onlyActive) camps = camps.filter(c => {
-      const isActive = c.effective_status === 'ACTIVE';
-      const concluded = isActive && c.stop_time && new Date(c.stop_time) < new Date();
-      return isActive && !concluded;
-    });
-    renderDash(camps, rawMetrics.daily, parseFloat(rawMetrics.spend), rawMetrics.impressions, rawMetrics.clicks, rawMetrics.conversations, rawMetrics.reach, rawMetrics.ctr, rawMetrics.cpm, false, rawMetrics.accountStatus||1);
+    applyNameFilter();
   }
 }
 
@@ -635,7 +729,7 @@ function buildCard(o) {
 async function openCampaign(campId, campName) {
   document.getElementById('modal-content').innerHTML = '<div class="modal-loading"><span class="spinner"></span>Carregando campanha...</div>';
   document.getElementById('modal-overlay').classList.add('open');
-  const res = await fetch(`${API}/campaign/${campId}?accountId=${currentAccountId}&period=${currentPeriod}`);
+  const res = await fetch(`${API}/campaign/${campId}?accountId=${currentAccountId}&since=${currentSince}&until=${currentUntil}`);
   const m = await res.json();
   if (m.error) { document.getElementById('modal-content').innerHTML = '<div class="modal-loading">Erro ao carregar campanha.</div>'; return; }
 
@@ -708,7 +802,7 @@ async function openCampaign(campId, campName) {
 
   document.getElementById('modal-content').innerHTML = `
     <div class="modal-title">${campName}</div>
-    <div class="modal-sub">${fmtObjective(m.objective)} · Métricas — ${currentPeriod==='7d'?'7':currentPeriod==='30d'?'30':'90'} dias</div>
+    <div class="modal-sub">${fmtObjective(m.objective)} · ${currentRangeLabel}</div>
     ${featuredHtml}
     ${othersHtml}
   `;
@@ -913,17 +1007,10 @@ function exportPoloCsv() {
   URL.revokeObjectURL(url);
 }
 
-function setPeriod(p, el) {
-  currentPeriod = p;
-  document.querySelectorAll('.ptab').forEach(t => t.classList.remove('active'));
-  el.classList.add('active');
-  loadDash();
-}
-
 function setCampFilter(activeOnly) {
   onlyActive = activeOnly;
   updateCampButtons();
-  applyFilter();
+  applyNameFilter();
 }
 
 function updateCampButtons() {
@@ -993,9 +1080,6 @@ window.addEventListener('load', async () => {
     const btn = document.getElementById('theme-btn');
     if (btn) btn.textContent = '☀️';
   }
-  currentPeriod = '7d';
-  document.querySelectorAll('.ptab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.ptab')[0].classList.add('active');
   const saved = sessionStorage.getItem('metadash_email');
   if (saved) {
     document.getElementById('login-email').value = saved;
