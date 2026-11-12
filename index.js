@@ -286,11 +286,13 @@ app.post('/metrics-campaigns-date', async (req, res) => {
 });
 
 // Renova tokens automaticamente
+const SKIP_RENEW = ['act_1415176060447394']; // contas com token de System User
 async function renewTokens() {
   try {
     const { data: accounts, error } = await supabase.from('ad_accounts').select('*');
     if (error || !accounts) { console.error('Erro ao buscar contas:', error); return; }
     for (const acc of accounts) {
+      if (SKIP_RENEW.includes(acc.account_id)) { console.log('Renovação ignorada (System User): ' + acc.account_name); continue; }
       try {
         const res = await axios.get('https://graph.facebook.com/v19.0/oauth/access_token', {
           params: {
