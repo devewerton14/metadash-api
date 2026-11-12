@@ -286,7 +286,7 @@ app.post('/metrics-campaigns-date', async (req, res) => {
 });
 
 // Renova tokens automaticamente
-const SKIP_RENEW = ['act_1415176060447394']; // contas com token de System User
+const SKIP_RENEW = ['act_1415176060447394','act_764123130705341','act_466229668843496','act_1876298802740115']; // contas com token de System User
 async function renewTokens() {
   try {
     const { data: accounts, error } = await supabase.from('ad_accounts').select('*');
